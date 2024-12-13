@@ -1,0 +1,31 @@
+/*********** Generic WinAPI handle ************/
+#pragma once
+
+#include <atomic>
+#include "winnt.h"
+
+constexpr HANDLE INVALID_HANDLE_VALUE = nullptr;
+
+struct handle_t
+{
+    enum class handle_type { HANDLE_INVALID, HANDLE_FILE, HANDLE_EVENT, HANDLE_THREAD, HANDLE_TOKEN };
+    handle_type type = handle_type::HANDLE_INVALID;
+
+    virtual void release()
+    {
+        delete this;
+    }
+
+    virtual int GetWaitableHandle() = 0;
+    // Is called by wait functions if this handle become signalled.
+    // Returns true if wait succeeded indeed. If returned false, errno must be checked for error.
+    virtual bool FinishWait() { return true; };
+
+protected:
+    virtual ~handle_t()
+    {
+        type = handle_type::HANDLE_INVALID; // Make use-after-delete a bit safer
+    }
+};
+
+WINBOOL CloseHandle(HANDLE& h);

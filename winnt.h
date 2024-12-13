@@ -1,0 +1,175 @@
+#pragma once
+
+#include <stdint.h>
+
+#include "windef.h"
+
+union LARGE_INTEGER
+{
+    struct
+    {
+        uint32_t LowPart;
+        int32_t HighPart;
+    };
+    long long int QuadPart;
+};
+
+struct handle_t;
+typedef handle_t* HANDLE;
+typedef int HRESULT;
+
+typedef wchar_t WCHAR;	// may be it is better to make it char16_t?..
+typedef WCHAR *LPWSTR;
+typedef long int LONG;
+
+// Windows limit is 64 but who cares?..
+// 1024 is Linux default limit for pool. The Core has hardcoded limit 1024*1024.
+// The best would be to get RLIMIT_NOFILE of course...
+constexpr DWORD MAXIMUM_WAIT_OBJECTS = 1024;
+
+// Specific rights
+constexpr DWORD FILE_READ_DATA	= 0x00000001L;
+constexpr DWORD FILE_WRITE_DATA	= 0x00000002L;
+constexpr DWORD FILE_TRAVERSE	= 0x00000020L;
+
+// Standard rights
+constexpr DWORD DELETE			= 0x00010000L;
+constexpr DWORD WRITE_DAC       = 0x00040000L;
+
+// Generic rigths
+constexpr DWORD GENERIC_READ	= 0x80000000L;
+constexpr DWORD GENERIC_WRITE	= 0x40000000L;
+constexpr DWORD GENERIC_EXECUTE	= 0x20000000L;
+constexpr DWORD GENERIC_ALL		= 0x10000000L;
+
+constexpr DWORD FILE_SHARE_READ		= 0x00000001L;
+constexpr DWORD FILE_SHARE_WRITE	= 0x00000002L;
+constexpr DWORD FILE_SHARE_DELETE	= 0x00000004L;
+
+constexpr DWORD FILE_ATTRIBUTE_READONLY	= 0x00000001L;
+constexpr DWORD FILE_ATTRIBUTE_HIDDEN	= 0x00000002L;
+constexpr DWORD FILE_ATTRIBUTE_NORMAL	= 0x00000080L;
+constexpr DWORD FILE_ATTRIBUTE_TEMPORARY = 0x00000100L;
+
+// There is no point to repeat whole structure because direct access to fields is discouraged
+// by MS
+struct SID
+{
+	BYTE SubAuthorityCount;
+	BYTE IdentifierAuthority;	// What this SID belongs to;
+	uint32_t SubAuthority[0];
+};
+
+#define SID_REVISION (1)
+#define SID_MAX_SUBAUTHORITIES	(8)
+#define SECURITY_MAX_SID_SIZE	(sizeof(SID) + SID_MAX_SUBAUTHORITIES * sizeof(uint32_t))
+
+enum SID_NAME_USE
+{
+	SidTypeUser = 1,
+	SidTypeGroup,
+	SidTypeAlias,
+	SidTypeInvalid,
+	SidTypeUnknown,
+};
+
+enum SidAuthorities_
+{
+	SECURITY_NULL_SID_AUTHORITY		= 0,
+	SECURITY_WORLD_SID_AUTHORITY	= 1,
+	SECURITY_LOCAL_SID_AUTHORITY	= 2,
+	SECURITY_CREATOR_SID_AUTHORITY	= 3,
+	SECURITY_NON_UNIQUE_AUTHORITY	= 4,
+	SECURITY_NT_AUTHORITY 			= 5
+};
+
+constexpr uint32_t SECURITY_WORLD_RID			= 0;
+constexpr uint32_t SECURITY_CREATOR_OWNER_RID	= 0;
+constexpr uint32_t SECURITY_CREATOR_GROUP_RID	= 1;
+
+enum WELL_KNOWN_SID_TYPE
+{
+	WinBuiltinAdministratorsSid = 26
+};
+
+typedef uint32_t ACCESS_MASK;
+
+struct ACE
+{
+	ACCESS_MASK Mask;
+	BYTE AceType;
+	BYTE AceFlags;
+	SID Sid;
+};
+
+constexpr BYTE ACCESS_ALLOWED_ACE_TYPE	= 0;
+constexpr BYTE ACCESS_DENIED_ACE_TYPE	= 1;
+
+#define ACL_REVISION (1)
+
+struct ACL
+{
+	BYTE AclRevision;
+	WORD AclSize;
+	WORD AclCount;
+	alignas(ACE) char AceBuffer[];
+};
+
+typedef WORD SECURITY_DESCRIPTOR_CONTROL;
+typedef SID* PSID;
+typedef ACL* PACL;
+
+#define SECURITY_DESCRIPTOR_REVISION (1)
+
+struct SECURITY_DESCRIPTOR
+{
+	BYTE Revision;
+	SECURITY_DESCRIPTOR_CONTROL Control;
+	PSID Owner;
+	PSID Group;
+	PACL Sacl;
+	PACL Dacl;
+};
+
+constexpr SECURITY_DESCRIPTOR_CONTROL SE_OWNER_DEFAULTED	= 0x0001;
+constexpr SECURITY_DESCRIPTOR_CONTROL SE_GROUP_DEFAULTED	= 0x0002;
+constexpr SECURITY_DESCRIPTOR_CONTROL SE_DACL_PRESENT		= 0x0004;
+constexpr SECURITY_DESCRIPTOR_CONTROL SE_DACL_DEFAULTED		= 0x0008;
+constexpr SECURITY_DESCRIPTOR_CONTROL SE_SACL_PRESENT		= 0x0010;
+constexpr SECURITY_DESCRIPTOR_CONTROL SE_SACL_DEFAULTED		= 0x0020;
+constexpr SECURITY_DESCRIPTOR_CONTROL SE_DACL_AUTO_INHERIT_REQ	= 0x0100;
+constexpr SECURITY_DESCRIPTOR_CONTROL SE_SACL_AUTO_INHERIT_REQ	= 0x0200;
+constexpr SECURITY_DESCRIPTOR_CONTROL SE_DACL_AUTO_INHERITED	= 0x0400;
+constexpr SECURITY_DESCRIPTOR_CONTROL SE_SACL_AUTO_INHERITED	= 0x0800;
+constexpr SECURITY_DESCRIPTOR_CONTROL SE_DACL_PROTECTED		= 0x1000;
+constexpr SECURITY_DESCRIPTOR_CONTROL SE_SACL_PROTECTED		= 0x2000;
+constexpr SECURITY_DESCRIPTOR_CONTROL SE_RM_CONTROL_VALID	= 0x4000;
+constexpr SECURITY_DESCRIPTOR_CONTROL SE_SELF_RELATIVE		= 0x8000;
+
+typedef DWORD SECURITY_INFORMATION;
+
+constexpr SECURITY_INFORMATION OWNER_SECURITY_INFORMATION	= 0x0001;
+constexpr SECURITY_INFORMATION GROUP_SECURITY_INFORMATION	= 0x0002;
+constexpr SECURITY_INFORMATION DACL_SECURITY_INFORMATION	= 0x0004;
+
+constexpr SECURITY_INFORMATION PROTECTED_DACL_SECURITY_INFORMATION		= 0x80000000;
+constexpr SECURITY_INFORMATION UNPROTECTED_DACL_SECURITY_INFORMATION	= 0x20000000;
+
+struct SID_AND_ATTRIBUTES
+{
+	PSID Sid;
+	DWORD Attributes;
+};
+
+struct TOKEN_USER
+{
+	SID_AND_ATTRIBUTES User;
+};
+
+constexpr DWORD TOKEN_QUERY		= 0x0008L;
+
+enum TOKEN_INFORMATION_CLASS
+{
+	TokenUser = 1,
+	//TokenGroups
+};
