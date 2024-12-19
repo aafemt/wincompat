@@ -6,7 +6,7 @@
 
 #include "windows.h"
 
-WINBOOL CloseHandle(HANDLE& h)
+WINBOOL CloseHandle(volatile HANDLE& h)
 {
     if (reinterpret_cast<intptr_t>(h) < 0 && reinterpret_cast<intptr_t>(h) > -100)
     {

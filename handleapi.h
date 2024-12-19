@@ -28,4 +28,4 @@ protected:
     }
 };
 
-WINBOOL CloseHandle(HANDLE& h);
+WINBOOL CloseHandle(volatile HANDLE& h);

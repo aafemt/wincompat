@@ -567,6 +567,11 @@ HANDLE CreateFile(const char* lpFileName, DWORD dwDesiredAccess, DWORD dwShareMo
             unlink(lpFileName);
         }
 
+        if (dwFlagsAndAtrributes & FILE_FLAG_SEQUENTIAL_SCAN)
+        {
+            posix_fadvise(h, 0, 0, POSIX_FADV_SEQUENTIAL);
+        }
+
         if (dwFlagsAndAtrributes & FILE_ATTRIBUTE_TEMPORARY)
         {
             // I hope kernel can recognize this hint and avoid flushes as much as possible
