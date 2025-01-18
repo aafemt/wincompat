@@ -38,6 +38,42 @@ struct SECURITY_ATTRIBUTES
 };
 typedef SECURITY_ATTRIBUTES *LPSECURITY_ATTRIBUTES;
 
+struct FILETIME
+{
+	unsigned dwLowDateTime;
+	unsigned dwHighDateTime;
+};
+
+struct WIN32_FIND_DATAA
+{
+	DWORD dwFileAttributes;
+	FILETIME ftCreationTime;
+	FILETIME ftLastAccessTime;
+	FILETIME ftLastWriteTime;
+	unsigned int nFileSizeHigh;
+	unsigned int nFileSizeLow;
+	char cFileName[MAX_PATH];
+	char cAlternateFileName[14];
+};
+
+struct WIN32_FIND_DATAW
+{
+	DWORD dwFileAttributes;
+	FILETIME ftCreationTime;
+	FILETIME ftLastAccessTime;
+	FILETIME ftLastWriteTime;
+	unsigned int nFileSizeHigh;
+	unsigned int nFileSizeLow;
+	wchar_t cFileName[MAX_PATH];
+	wchar_t cAlternateFileName[14];
+};
+
+#ifdef UNICODE
+typedef WIN32_FIND_DATAW WIN32_FIND_DATA;
+#else
+typedef WIN32_FIND_DATAA WIN32_FIND_DATA;
+#endif // UNICODE
+
 typedef void* HLOCAL;
 
 inline HLOCAL LocalFree(HLOCAL hMem)

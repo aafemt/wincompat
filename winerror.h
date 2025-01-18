@@ -21,8 +21,10 @@
 #define ERROR_INVALID_NAME		EILSEQ	// Good for Unicode functions may be a bad choice for ANSI
 
 // Linux seems to miss these errors so we can assign them to somethig beyond of usual range
+#define ERROR_NO_MORE_FILES		1018
 #define ERROR_BAD_LENGTH        1024
 #define ERROR_HANDLE_EOF        1038
+#define ERROR_NOT_SUPPORTED		1050
 #define ERROR_UNKNOWN_REVISION	1305	// May be it can be EINVAL
 #define ERROR_NO_SUCH_GROUP		1319
 #define ERROR_INVALID_ACL		1336

@@ -42,6 +42,7 @@ WINBOOL SetFileInformationByHandle(HANDLE hFile, FILE_INFO_BY_HANDLE_CLASS FileI
 WINBOOL SetEndOfFile(HANDLE hFile);
 WINBOOL GetFileSizeEx(HANDLE hFile, LARGE_INTEGER* lpFileSize);
 WINBOOL DeleteFile(const char* lpFileName);
+WINBOOL DeleteFile(const wchar_t* lpFileName);
 
 DWORD GetTempPath(DWORD nBufferLength, char* lpBuffer);
 DWORD GetTempPath(DWORD nBufferLength, wchar_t* lpBuffer);
@@ -55,3 +56,9 @@ inline DWORD GetTempPathW(DWORD nBufferLength, wchar_t* lpBuffer)
 }
 
 WINBOOL CreateDirectory(const char* lpPathName, SECURITY_ATTRIBUTES* lpSecurityAttributes);
+
+HANDLE FindFirstFile(const char* lpFileName, WIN32_FIND_DATAA* lpFindFileData);
+HANDLE FindFirstFile(const wchar_t* lpFileName, WIN32_FIND_DATAW* lpFindFileData);
+WINBOOL FindNextFile(HANDLE hFindFile, WIN32_FIND_DATAA* lpFindFileData);
+WINBOOL FindNextFile(HANDLE hFindFile, WIN32_FIND_DATAW* lpFindFileData);
+WINBOOL FindClose(volatile HANDLE& hFindFile);

@@ -1008,6 +1008,20 @@ WINBOOL DeleteFile(const char* lpFileName)
     return TRUE;
 }
 
+WINBOOL DeleteFile(const wchar_t* lpFileName)
+{
+    char name[MAX_PATH];
+    if (wcstombs(name, lpFileName, sizeof(name)) >= sizeof(name))
+    {
+        return FALSE;
+    }
+    if (unlink(name) == -1)
+    {
+        return FALSE;
+    }
+    return TRUE;
+}
+
 #ifdef TESTING
 #include <stdio.h>
 #include "windows.h"

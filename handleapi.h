@@ -8,7 +8,7 @@ constexpr HANDLE INVALID_HANDLE_VALUE = nullptr;
 
 struct handle_t
 {
-    enum class handle_type { HANDLE_INVALID, HANDLE_FILE, HANDLE_EVENT, HANDLE_THREAD, HANDLE_TOKEN };
+    enum class handle_type { HANDLE_INVALID, HANDLE_FILE, HANDLE_EVENT, HANDLE_THREAD, HANDLE_TOKEN, HANDLE_FIND };
     handle_type type = handle_type::HANDLE_INVALID;
 
     virtual void release()
