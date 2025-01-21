@@ -990,15 +990,6 @@ FILE* _wfopen(const wchar_t* filename, const wchar_t* mode)
     return fopen(fn.get(), m.get());
 }
 
-WINBOOL CreateDirectory(const char* lpPathName, [[maybe_unused]]SECURITY_ATTRIBUTES* lpSecurityAttributes)
-{
-    if (mkdir(lpPathName, 0777) == 0) // For now request full access. TODO: recognize lpSecurityAttributes
-    {
-        return TRUE;
-    }
-    return FALSE;
-}
-
 WINBOOL DeleteFile(const char* lpFileName)
 {
     if (unlink(lpFileName) == -1)

@@ -44,6 +44,8 @@ void SetUp()
 	CreateTestFile(L"testfile1.txt", 1);
 	CreateTestFile(L"testfile2.txt", 2);
 	CreateTestFile(L"testfile3.log", 3);
+	CreateDirectory(L"existentpath", nullptr);
+	CreateTestFile(L"existentpath/testfile1.txt", 1);
 }
 
 void TearDown()
@@ -52,6 +54,8 @@ void TearDown()
 	DeleteTestFile(L"testfile1.txt");
 	DeleteTestFile(L"testfile2.txt");
 	DeleteTestFile(L"testfile3.log");
+	DeleteTestFile(L"existentpath/testfile1.txt");
+	RemoveDirectory(L"existentpath");
 }
 
 void FindExistingFiles()
@@ -144,28 +148,29 @@ void FindDifferentPattern()
 
 using namespace std::literals::string_view_literals;
 
-void MatchAllFiles()
+constexpr const WCHAR* const expectedNames[] =
+{
+	L"testfile1.txt",
+	L"testfile2.txt",
+	L"testfile3.log",
+	L".",
+	L"..",
+	L"tests.exe",
+	L"tests",
+	L"obj",
+	L"existentpath"
+};
+
+void MatchAllFiles(const wchar_t* pattern)
 {
     WIN32_FIND_DATA findFileData;
-    HANDLE hFind = FindFirstFile(L"*", &findFileData);
+    HANDLE hFind = FindFirstFile(pattern, &findFileData);
 
     if (hFind == INVALID_HANDLE_VALUE)
 	{
 		failure("FindFirstFile expected to match all files but got INVALID_HANDLE_VALUE\n");
 		return;
 	}
-
-	constexpr const WCHAR* const expectedNames[] =
-	{
-		L"testfile1.txt",
-		L"testfile2.txt",
-		L"testfile3.log",
-		L".",
-		L"..",
-		L"tests.exe",
-		L"tests",
-		L"obj"
-	};
 
     // List all files
     do
@@ -181,7 +186,7 @@ void MatchAllFiles()
 		}
 		if (!found)
 		{
-			printf("FindFirstFile found unexpected file: %S\n", findFileData.cFileName);
+			failure("FindFirstFile found unexpected file: %S\n", findFileData.cFileName);
 		}
 
 		if (std::wstring_view(findFileData.cFileName) == L".."sv && (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
@@ -235,7 +240,8 @@ void RunFindTests()
 	FindExistingFiles();
 	NoMatchingFiles();
 	FindDifferentPattern();
-	MatchAllFiles();
+	MatchAllFiles(L"*");
+	MatchAllFiles(L"existentpath/*");
 	InvalidPath();
 
 	TearDown();

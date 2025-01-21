@@ -56,6 +56,10 @@ inline DWORD GetTempPathW(DWORD nBufferLength, wchar_t* lpBuffer)
 }
 
 WINBOOL CreateDirectory(const char* lpPathName, SECURITY_ATTRIBUTES* lpSecurityAttributes);
+WINBOOL CreateDirectory(const wchar_t* lpPathName, SECURITY_ATTRIBUTES* lpSecurityAttributes);
+
+WINBOOL RemoveDirectory(const char* lpPathName);
+WINBOOL RemoveDirectory(const wchar_t* lpPathName);
 
 HANDLE FindFirstFile(const char* lpFileName, WIN32_FIND_DATAA* lpFindFileData);
 HANDLE FindFirstFile(const wchar_t* lpFileName, WIN32_FIND_DATAW* lpFindFileData);

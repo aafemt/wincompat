@@ -52,7 +52,7 @@ struct WIN32_FIND_DATAA
 	FILETIME ftLastWriteTime;
 	unsigned int nFileSizeHigh;
 	unsigned int nFileSizeLow;
-	char cFileName[MAX_PATH];
+	char cFileName[NAME_MAX];
 	char cAlternateFileName[14];
 };
 
@@ -64,7 +64,7 @@ struct WIN32_FIND_DATAW
 	FILETIME ftLastWriteTime;
 	unsigned int nFileSizeHigh;
 	unsigned int nFileSizeLow;
-	wchar_t cFileName[MAX_PATH];
+	wchar_t cFileName[NAME_MAX];
 	wchar_t cAlternateFileName[14];
 };
 

@@ -49,6 +49,38 @@ static FILETIME TimespecToFileTime(const timespec& t)
 	return result;
 }
 
+static void setAttributes(mode_t mode, DWORD& attributes)
+{
+	// FILE_ATTRIBUTE_READONLY/HIDDEN/etc is left unhandled for a while because POSIX has no R/O attribute
+	// analyze of privilegies is not what one would expect. Perhaps being on R/O mount device can count.
+
+	switch (mode & S_IFMT)
+	{
+	case S_IFDIR:
+		{
+			attributes |= FILE_ATTRIBUTE_DIRECTORY;
+			break;
+		}
+	case S_IFBLK:
+	case S_IFCHR:
+		{
+			attributes |= FILE_ATTRIBUTE_DEVICE;
+			break;
+		}
+	case S_IFLNK:
+		{
+			attributes |= FILE_ATTRIBUTE_REPARSE_POINT;
+			break;
+		}
+	case S_IFREG:
+		{
+			attributes |= FILE_ATTRIBUTE_NORMAL;
+			break;
+		}
+	// default: what could it be?..
+	}
+}
+
 WINBOOL FindHandle::fillStruct(WIN32_FIND_DATAA* findData)
 {
 	if (current >= g.gl_pathc)
@@ -60,14 +92,25 @@ WINBOOL FindHandle::fillStruct(WIN32_FIND_DATAA* findData)
 	memset(findData, 0, sizeof(*findData));
 
 	const char* fileName = g.gl_pathv[current++];
-	size_t nameLen = strlen(fileName);
+	const char* name = strrchr(fileName, '/');
+	if (name == nullptr)
+	{
+		name = fileName;
+	}
+	else
+	{
+		++name;
+	}
+
+	size_t nameLen = strlen(name);
 	if (nameLen >= sizeof(findData->cFileName))
 	{
 		errno = ENAMETOOLONG;
 		return FALSE;
 	}
 
-	strcpy(findData->cFileName, fileName);
+	strcpy(findData->cFileName, name);
+
 	// cAlternateFileName is allowed to be empty
 	struct stat stats = {};
 	if (stat(fileName, &stats) != 0)
@@ -76,35 +119,7 @@ WINBOOL FindHandle::fillStruct(WIN32_FIND_DATAA* findData)
 	}
 
 	// Fill dwFileAttributes
-
-	// FILE_ATTRIBUTE_READONLY/HIDDEN/etc is left unhandled for a while because POSIX has no R/O attribute
-	// analyze of privilegies is not what one would expect. Perhaps being on R/O mount device can count.
-
-	switch (stats.st_mode & S_IFMT)
-	{
-	case S_IFDIR:
-		{
-			findData->dwFileAttributes |= FILE_ATTRIBUTE_DIRECTORY;
-			break;
-		}
-	case S_IFBLK:
-	case S_IFCHR:
-		{
-			findData->dwFileAttributes |= FILE_ATTRIBUTE_DEVICE;
-			break;
-		}
-	case S_IFLNK:
-		{
-			findData->dwFileAttributes |= FILE_ATTRIBUTE_REPARSE_POINT;
-			break;
-		}
-	case S_IFREG:
-		{
-			findData->dwFileAttributes |= FILE_ATTRIBUTE_NORMAL;
-			break;
-		}
-	// default: what could it be?..
-	}
+	setAttributes(stats.st_mode, findData->dwFileAttributes);
 
 	// File size
 	findData->nFileSizeLow = stats.st_size;
@@ -129,8 +144,17 @@ WINBOOL FindHandle::fillStruct(WIN32_FIND_DATAW* findData)
 	memset(findData, 0, sizeof(*findData));
 
 	const char* fileName = g.gl_pathv[current++];
-	size_t nameLen = mbstowcs(findData->cFileName, fileName, MAX_PATH);
-	if (nameLen >= MAX_PATH)
+	const char* name = strrchr(fileName, '/');
+	if (name == nullptr)
+	{
+		name = fileName;
+	}
+	else
+	{
+		++name;
+	}
+	size_t nameLen = mbstowcs(findData->cFileName, name, sizeof(findData->cFileName));
+	if (nameLen >= sizeof(findData->cFileName))
 	{
 		errno = ENAMETOOLONG;
 		return FALSE;
@@ -144,35 +168,7 @@ WINBOOL FindHandle::fillStruct(WIN32_FIND_DATAW* findData)
 	}
 
 	// Fill dwFileAttributes
-
-	// FILE_ATTRIBUTE_READONLY/HIDDEN/etc is left unhandled for a while because POSIX has no R/O attribute
-	// analyze of privilegies is not what one would expect. Perhaps being on R/O mount device can count.
-
-	switch (stats.st_mode & S_IFMT)
-	{
-	case S_IFDIR:
-		{
-			findData->dwFileAttributes |= FILE_ATTRIBUTE_DIRECTORY;
-			break;
-		}
-	case S_IFBLK:
-	case S_IFCHR:
-		{
-			findData->dwFileAttributes |= FILE_ATTRIBUTE_DEVICE;
-			break;
-		}
-	case S_IFLNK:
-		{
-			findData->dwFileAttributes |= FILE_ATTRIBUTE_REPARSE_POINT;
-			break;
-		}
-	case S_IFREG:
-		{
-			findData->dwFileAttributes |= FILE_ATTRIBUTE_NORMAL;
-			break;
-		}
-	// default: what could it be?..
-	}
+	setAttributes(stats.st_mode, findData->dwFileAttributes);
 
 	// File size
 	findData->nFileSizeLow = stats.st_size;
