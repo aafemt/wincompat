@@ -153,7 +153,7 @@ WINBOOL FindHandle::fillStruct(WIN32_FIND_DATAW* findData)
 	{
 		++name;
 	}
-	size_t nameLen = mbstowcs(findData->cFileName, name, sizeof(findData->cFileName));
+	size_t nameLen = mbstowcs(findData->cFileName, name, std::size(findData->cFileName));
 	if (nameLen >= sizeof(findData->cFileName))
 	{
 		errno = ENAMETOOLONG;
