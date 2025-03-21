@@ -38,12 +38,13 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-Werror" />
+			<Add option="-O3" />
 			<Add option="-Wshadow" />
 			<Add option="-Wextra" />
 			<Add option="-Wall" />
-			<Add option="-std=c++17" />
-			<Add option="-Werror" />
 			<Add option="-ggdb" />
+			<Add option="-std=c++17" />
 		</Compiler>
 		<Unit filename="../accctrl.h">
 			<Option target="Linux" />
@@ -73,6 +74,9 @@
 			<Option target="Linux" />
 		</Unit>
 		<Unit filename="../findfile.cpp">
+			<Option target="Linux" />
+		</Unit>
+		<Unit filename="../getlocaleinfo.cpp">
 			<Option target="Linux" />
 		</Unit>
 		<Unit filename="../handle.cpp">
@@ -166,6 +170,8 @@
 		<Unit filename="find.h" />
 		<Unit filename="globals.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="nls.cpp" />
+		<Unit filename="nls.h" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

@@ -4,14 +4,19 @@
 *
 ********************************************************/
 
+#include <locale.h>
 #include <stdio.h>
 
 #include "globals.h"
 #include "find.h"
+#include "nls.h"
 
 int main()
 {
+	setlocale(LC_ALL, "");
+
 	RunFindTests();
+	RunNlsTests();
 
 	if (failed)
 	{

@@ -79,7 +79,7 @@ void FindExistingFiles()
 	if ((firstFile == L"testfile1.txt" && findFileData.nFileSizeLow != 1) ||
 		(firstFile == L"testfile2.txt" && findFileData.nFileSizeLow != 2))
 	{
-		failure("FindFirstFile found file %S with wrong size %u\n", firstFile.c_str(), findFileData.nFileSizeLow);
+		failure("FindFirstFile found file %S with wrong size %u\n", firstFile.c_str(), (unsigned)findFileData.nFileSizeLow);
 	}
 
 	if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
@@ -98,7 +98,7 @@ void FindExistingFiles()
 		if ((nextFile == L"testfile1.txt" && findFileData.nFileSizeLow != 1) ||
 			(nextFile == L"testfile2.txt" && findFileData.nFileSizeLow != 2))
 		{
-			failure("FindNextFile found file %S with wrong size %u\n", nextFile.c_str(), findFileData.nFileSizeLow);
+			failure("FindNextFile found file %S with wrong size %u\n", nextFile.c_str(), (unsigned)findFileData.nFileSizeLow);
 		}
 
     }
