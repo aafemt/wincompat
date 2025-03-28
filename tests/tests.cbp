@@ -91,6 +91,9 @@
 		<Unit filename="../libloaderapi.h">
 			<Option target="Linux" />
 		</Unit>
+		<Unit filename="../mbstowcs_l.cpp">
+			<Option target="Linux" />
+		</Unit>
 		<Unit filename="../process.cpp">
 			<Option target="Linux" />
 		</Unit>
@@ -131,6 +134,9 @@
 			<Option target="Linux" />
 		</Unit>
 		<Unit filename="../shlwapi.h">
+			<Option target="Linux" />
+		</Unit>
+		<Unit filename="../stdlib.h">
 			<Option target="Linux" />
 		</Unit>
 		<Unit filename="../synchron.cpp">

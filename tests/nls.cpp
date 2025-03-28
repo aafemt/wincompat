@@ -7,16 +7,22 @@
 #include <stdio.h>
 #include <windows.h>
 #include <wchar.h>
+#include <wctype.h>
 
 #include "globals.h"
 
-void checkLocaleInfo(LCID locale, LCTYPE value, const wchar_t* expected)
+void checkLocaleInfo(LCID locale, LCTYPE value, const wchar_t* expected, DWORD expectError = 0)
 {
 	wchar_t buffer[80] = {};
 	int r = GetLocaleInfoW(locale, value, buffer, 80);
 	if (r == 0)
 	{
-		failure("Failed to get name, for locale %u, constant %u. Error %lu", (unsigned)locale, (unsigned)value, GetLastError());
+		DWORD err = GetLastError();
+		if (err != expectError)
+		{
+			failure("Failed to get name for locale %u, constant %u. Error %lu, expected %lu", (unsigned)locale, (unsigned)value, err, expectError);
+		}
+		return;
 	}
 	--r;
 	for (int i = 0; i < r; i++)
@@ -75,4 +81,5 @@ void RunNlsTests()
 	checkLocaleInfo(LOCALE_INVARIANT, LOCALE_SABBREVDAYNAME5, L"FRI");
 	checkLocaleInfo(LOCALE_INVARIANT, LOCALE_SABBREVDAYNAME6, L"SAT");
 	checkLocaleInfo(LOCALE_INVARIANT, LOCALE_SABBREVDAYNAME7, L"SUN");
+	checkLocaleInfo(0x1111, LOCALE_SABBREVDAYNAME7, L"NO LOCALE", ERROR_INVALID_PARAMETER);
 }
