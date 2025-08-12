@@ -7,7 +7,7 @@ local Build = [
 local Steps = [
     {
       name: "show environment",
-      image: "dctl-registry.dcinet:5000/windows-servercore-1809/vs2002",
+//      image: "dctl-registry.dcinet:5000/windows-servercore-1809/vs2002",
       commands:
       [
         "echo $PWD %CD%",
