@@ -38,6 +38,18 @@ local Steps = [
   },
   clone: { disable: true },
   trigger: { event: [ "push", "custom" ] },
-  steps: Steps
+  steps:
+  [
+    {
+      name: "show environment",
+      image: "dctl-registry.dcinet:5000/windows-servercore-1809/vs2022",
+      commands:
+      [
+        "echo $PWD %CD%",
+		"MSBuild -version",
+		"msbuild -version"
+      ]
+    }
+  ]
 }
 ]
