@@ -45,8 +45,8 @@ local Steps = [
       image: "dctl-registry.dcinet:5000/windows-servercore-1809/vs2022",
       commands:
       [
-        "echo $PWD",
-		"echo $env:PATH"
+        "$PWD",
+		"dir env:"
       ]
     }
   ]
