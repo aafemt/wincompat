@@ -30,7 +30,7 @@ local Steps = [
 [
 {
   kind: "pipeline",
-  name: "Windows 644 build",
+  name: "Windows 64 build",
   platform: {
     os: "windows",
     arch: "amd64",
@@ -45,9 +45,8 @@ local Steps = [
       image: "dctl-registry.dcinet:5000/windows-servercore-1809/vs2022",
       commands:
       [
-        "echo $PWD %CD%",
-		"MSBuild -version",
-		"msbuild -version"
+        "echo $PWD",
+		"echo $env:PATH"
       ]
     }
   ]
