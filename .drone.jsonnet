@@ -30,11 +30,11 @@ local Steps = [
 [
 {
   kind: "pipeline",
-  name: "test-on-windows",
+  name: "Windows 644 build",
   platform: {
     os: "windows",
     arch: "amd64",
-    version: "1904"
+    version: "1809"
   },
   clone: { disable: true },
   trigger: { event: [ "push", "custom" ] },
