@@ -45,12 +45,13 @@ local Steps = [
       image: "dctl-registry.dcinet:5000/windows-servercore-1809/vs2022",
       commands:
       [
+        "Set-PSDebug -Trace 2",
         "$PSVersionTable",
         "$PWD",
         "& $env:VS170COMNTOOLS/Launch-VsDevShell.ps1",
 		"dir env:",
         "msbuild -version",
-        "cmake --version"
+        "cmake --version",
       ]
     }
   ]
