@@ -48,7 +48,9 @@ local Steps = [
         "$PSVersionTable",
         "$PWD",
         "& $env:VS170COMNTOOLS/Launch-VsDevShell.ps1",
-		"dir env:"
+		"dir env:",
+        "msbuild -version",
+        "cmake --version"
       ]
     }
   ]
