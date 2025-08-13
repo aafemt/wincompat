@@ -36,7 +36,7 @@ local Steps = [
     arch: "amd64",
     version: "1809"
   },
-  clone: { disable: true },
+  clone: { depth: 1 },
   trigger: { event: [ "push", "custom" ] },
   steps:
   [
@@ -45,13 +45,22 @@ local Steps = [
       image: "dctl-registry.dcinet:5000/windows-servercore-1809/vs2022",
       commands:
       [
-        "Set-PSDebug -Trace 2",
+        "Set-PSDebug -Trace 1",
         "$PSVersionTable",
         "$PWD",
         "& $env:VS170COMNTOOLS/Launch-VsDevShell.ps1",
 		"dir env:",
         "msbuild -version",
         "cmake --version",
+      ]
+    },
+    {
+      name: "build",
+      image: "dctl-registry.dcinet:5000/windows-servercore-1809/vs2022",
+      commands:
+      [
+		"dir env:",
+        "msbuild -version",
       ]
     }
   ]
