@@ -47,7 +47,7 @@ local Steps = [
       [
         "$PSVersionTable",
         "$PWD",
-        "& $env:VS170COMNTOOLS\\Launch-VsDevShell.ps1",
+        "& $env:VS170COMNTOOLSLaunch-VsDevShell.ps1",
 		"dir env:"
       ]
     }
