@@ -54,15 +54,6 @@ local Steps = [
         "cmake --version",
       ]
     },
-    {
-      name: "build",
-      image: "dctl-registry.dcinet:5000/windows-servercore-1809/vs2022",
-      commands:
-      [
-		"dir env:",
-        "msbuild -version",
-      ]
-    }
   ]
 }
 ]
