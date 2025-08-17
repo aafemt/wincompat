@@ -47,7 +47,11 @@ local Steps = [
       settings:
       {
         depth: 1
-      }
+      },
+      commands:
+      [
+        "git clone --depth=1 -b ${DRONE_SOURCE_BRANCH} ${DRONE_GIT_SSH_URL}",
+      ]
     },
     {
       name: "show environment",
