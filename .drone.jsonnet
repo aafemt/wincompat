@@ -45,8 +45,8 @@ local Steps = [
       image: "drone/git",
       commands:
       [
-        "echo Hello Worls",
-        "echo $PWD %CD%",
+        "cmd /c echo Hello_World",
+//        "echo $PWD %CD%",
       ]
     },
   ]
