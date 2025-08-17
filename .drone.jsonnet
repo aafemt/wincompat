@@ -40,14 +40,14 @@ local Steps = [
   trigger: { event: [ "push", "custom" ] },
   steps:
   [
-    {
-      name: "Clone",
-      image: "drone/git",
-      commands:
-      [
-        "git clone --depth=1 -b ${DRONE_SOURCE_BRANCH} ${DRONE_GIT_HTTP_URL} wc",
-      ]
-    },
+//    {
+//      name: "Clone",
+//      image: "drone/git",
+//      commands:
+//      [
+//        "git clone --depth=1 -b ${DRONE_SOURCE_BRANCH} ${DRONE_GIT_HTTP_URL} wc",
+//      ]
+//    },
     {
       name: "show environment",
       image: "dctl-registry.dcinet:5000/windows-servercore-1809/vs2022",
