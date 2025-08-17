@@ -32,9 +32,9 @@ local Steps = [
   kind: "pipeline",
   name: "Windows 64 build",
   platform: {
-    os: "windows",
+    os: "linux",
     arch: "amd64",
-    version: "1809"
+//    version: "1809"
   },
 //  clone: { depth: 1 },
   clone: { disable: true },
