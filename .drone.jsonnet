@@ -36,10 +36,19 @@ local Steps = [
     arch: "amd64",
     version: "1809"
   },
-  clone: { depth: 1 },
+//  clone: { depth: 1 },
+  clone: { disabled: true },
   trigger: { event: [ "push", "custom" ] },
   steps:
   [
+    {
+      name: "clone",
+      image: "drone/git",
+      settings:
+      {
+        depth: 1
+      }
+    },
     {
       name: "show environment",
       image: "dctl-registry.dcinet:5000/windows-servercore-1809/vs2022",
