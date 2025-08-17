@@ -46,12 +46,12 @@ local Steps = [
       image: "drone/git",
       settings:
       {
-        depth: 1
+        disable: true,
       },
-//      commands:
-//      [
-//        "git clone --depth=1 -b ${DRONE_SOURCE_BRANCH} ${DRONE_GIT_SSH_URL}",
-//      ]
+      commands:
+      [
+        "git clone --depth=1 -b ${DRONE_SOURCE_BRANCH} ${DRONE_GIT_SSH_URL} wc",
+      ]
     },
     {
       name: "show environment",
