@@ -37,12 +37,12 @@ local Steps = [
     version: "1809"
   },
 //  clone: { depth: 1 },
-  clone: { disabled: true },
+  clone: { disable: true },
   trigger: { event: [ "push", "custom" ] },
   steps:
   [
     {
-      name: "clone",
+      name: "Clone",
       image: "drone/git",
       settings:
       {
