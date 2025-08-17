@@ -46,7 +46,7 @@ local Steps = [
       image: "drone/git",
       commands:
       [
-        "git clone --depth=1 -b ${DRONE_SOURCE_BRANCH} ${DRONE_GIT_SSH_URL} wc",
+        "git clone --depth=1 -b ${DRONE_SOURCE_BRANCH} ${DRONE_GIT_HTTP_URL} wc",
       ]
     },
     {
