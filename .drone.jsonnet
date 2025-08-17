@@ -40,26 +40,13 @@ local Steps = [
   trigger: { event: [ "push", "custom" ] },
   steps:
   [
-//    {
-//      name: "Clone",
-//      image: "drone/git",
-//      commands:
-//      [
-//        "git clone --depth=1 -b ${DRONE_SOURCE_BRANCH} ${DRONE_GIT_HTTP_URL} wc",
-//      ]
-//    },
     {
       name: "show environment",
-      image: "dctl-registry.dcinet:5000/windows-servercore-1809/vs2022",
+      image: "drone/git",
       commands:
       [
-        "Set-PSDebug -Trace 1",
-        "$PSVersionTable",
-        "$PWD",
-        "& $env:VS170COMNTOOLS/Launch-VsDevShell.ps1",
-		"dir env:",
-        "msbuild -version",
-        "cmake --version",
+        "echo Hello Worls",
+        "echo $PWD %CD%",
       ]
     },
   ]
