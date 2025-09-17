@@ -55,7 +55,7 @@ local Steps = [
       settings:
       {
         files: [ "README.md" ],    // files to upload to Gitea Release, globs are allowed. array, required  Default: none */
-        file_exists: "fail",  // what to do if a file asset already exists,
+        file_exists: "overwrite",  // what to do if a file asset already exists,
                                 // supported values - overwrite, skip and fail.  string optional  Default: overwrite
         note: "None",
         title: "Snapshot ${DRONE_COMMIT_SHA}",
