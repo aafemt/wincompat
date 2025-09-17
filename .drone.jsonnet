@@ -47,7 +47,7 @@ local Steps = [
       [
         "echo Hello_World",
         "dir env:",
-        "echo \"${DRONE_COMMIT_SHA}\"",
+        "echo \\"${DRONE_COMMIT_SHA}\\"",
       ]
     },
     {
