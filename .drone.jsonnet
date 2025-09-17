@@ -36,7 +36,7 @@ local Steps = [
     arch: "amd64",
     version: "1809"
   },
-  clone: { depth: 1 },
+//  clone: { depth: 1 },
   trigger: { event: [ "push", "custom" ] },
   steps:
   [

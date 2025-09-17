@@ -1,6 +1,4 @@
-- clone:
-    depth: 1
-  kind: "pipeline"
+- kind: "pipeline"
   name: "Windows 64 build"
   platform:
     arch: "amd64"
