@@ -57,7 +57,7 @@ local Steps = [
         files: [ "README.md" ],    // files to upload to Gitea Release, globs are allowed. array, required  Default: none */
         file_exists: "overwrite",  // what to do if a file asset already exists,
                                 // supported values - overwrite, skip and fail.  string optional  Default: overwrite
-        note: "${DRONE_COMMIT_MESSAGE}",  // file or string with notes for the release. string, optional. Default: none
+//        note: "${DRONE_COMMIT_MESSAGE}",  // file or string with notes for the release. string, optional. Default: none
 //        title: "Snapshot ${DRONE_COMMIT_SHA}",    // file or string for the title shown in the gitea release. string, optional. Default: none
         insecure: true,        // visit base_url via insecure https protocol. boolean, optional. Default: false
                             // Perhaps we can read the secret for PLUGIN_BASE_URL and test for http://
