@@ -1,0 +1,31 @@
+- clone:
+    depth: 1
+  kind: "pipeline"
+  name: "Windows 64 build"
+  platform:
+    arch: "amd64"
+    os: "windows"
+    version: "1809"
+  steps:
+  - commands:
+    - "echo Hello_World"
+    - "dir env:"
+    - "echo ${DRONE_COMMIT_MESSAGE}"
+    image: "dctl-registry.dcinet:5000/windows-servercore-1809/vs2022"
+    name: "show environment"
+  - image: "dctl-registry.dcinet:5000/windows-nanoserver-1809/drone-gitea-release-win"
+    name: "release"
+    settings:
+      api_key:
+        from_secret: "gitea_api_key"
+      base_url: "https://scm.ibphoenix.com:3000"
+      file_exists: "overwrite"
+      files:
+      - "README.md"
+      note: "Here is nothing"
+      title: "${DRONE_COMMIT_MESSAGE}"
+      verbose: true
+  trigger:
+    event:
+    - "push"
+    - "custom"
