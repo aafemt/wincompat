@@ -73,7 +73,6 @@ local Steps = [
 //                                     // Supported hash methods include - md5, sha1, sha256, sha512, adler32, and crc32.
 //                                     // string, optional   Default: none
         verbose: true,
-        debug: true,
       },
     }
   ]
