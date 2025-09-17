@@ -51,7 +51,7 @@ local Steps = [
     },
     {
       name: "release",
-      image: "dctl-registry.dcinet:5000/windows-servercore-1809/drone-gitea-release-win",
+      image: "dctl-registry.dcinet:5000/windows-nanoserver-1809/drone-gitea-release-win",
       settings:
       {
         files: [ "README.md" ],    // files to upload to Gitea Release, globs are allowed. array, required  Default: none */
