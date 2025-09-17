@@ -47,7 +47,7 @@ local Steps = [
       [
         "echo Hello_World",
         "dir env:",
-        "echo $env:DRONE_COMMIT_MESSAGE",
+        "echo ${DRONE_COMMIT_MESSAGE##x}",
       ]
     },
     {
