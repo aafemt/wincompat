@@ -67,11 +67,13 @@ local Steps = [
         prerelease: true,  //For now always true - we will set manually.  Default: false
                         // Need to test for FB_BUILD_TYPE=T
 
-        api_key: { from_secret: "fb_api_token" },     // Gitea API key  string, required  Default: none
+        api_key: { from_secret: "ibp_api_token" },     // Gitea API key  string, required  Default: none
         base_url: { from_secret: "gitea_server" }, // Gitea base URL string, required  Default: none
         checksum: ["md5"],                // checksum takes hash methods to include in your Gitea release for the files specified.
 //                                     // Supported hash methods include - md5, sha1, sha256, sha512, adler32, and crc32.
 //                                     // string, optional   Default: none
+        verbose: true,
+        debug: true,
       },
     }
   ]
