@@ -42,13 +42,38 @@ local Steps = [
   [
     {
       name: "show environment",
-      image: "drone/git",
+      image: "dctl-registry.dcinet:5000/windows-servercore-1809/vs2022",
       commands:
       [
-//        "pwsh echo Hello_World",
-//        "echo $PWD %CD%",
+        "echo Hello_World",
+        "dir env:",
       ]
     },
+    {
+      name: "release",
+      image: "dctl-registry.dcinet:5000/windows-servercore-1809/drone-gitea-release-win",
+      settings:
+      {
+        files: [ "README.md" ],    // files to upload to Gitea Release, globs are allowed. array, required  Default: none */
+        file_exists: "overwrite",  // what to do if a file asset already exists,
+                                // supported values - overwrite, skip and fail.  string optional  Default: overwrite
+        note: "Snapshot",
+//     note: "${DRONE_COMMIT_MESSAGE:-empty_drone_commit_message}",  // file or string with notes for the release. string, optional. Default: none
+        title: "No title",    // file or string for the title shown in the gitea release. string, optional. Default: none
+        insecure: true,        // visit base_url via insecure https protocol. boolean, optional. Default: false
+                            // Perhaps we can read the secret for PLUGIN_BASE_URL and test for http://
+
+        draft: true,       // For now always true - we will set manually. Default: false
+        prerelease: true,  //For now always true - we will set manually.  Default: false
+                        // Need to test for FB_BUILD_TYPE=T
+
+        api_key: { from_secret: "fb_api_token" },     // Gitea API key  string, required  Default: none
+        base_url: { from_secret: "gitea_server" }, // Gitea base URL string, required  Default: none
+        checksum: ["md5"],                // checksum takes hash methods to include in your Gitea release for the files specified.
+//                                     // Supported hash methods include - md5, sha1, sha256, sha512, adler32, and crc32.
+//                                     // string, optional   Default: none
+      },
+    }
   ]
 }
 ]
