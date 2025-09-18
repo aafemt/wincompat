@@ -15,7 +15,7 @@
       image: "dctl-registry.dcinet:5000/windows-servercore-1809/vs2022",
       environment:
         [
-			{ TEST_ENV_VAR: "${DRONE_COMMIT_MESSAGE}", },
+			{ TEST_ENV_VAR: "${DRONE_COMMIT_SHA}", },
         ],
       commands:
       [
