@@ -1,33 +1,3 @@
-local Build = [
-        "./configure",
-        "make",
-        "make test"
-];
-
-local Steps = [
-    {
-      name: "show environment",
-//      image: "dctl-registry.dcinet:5000/windows-servercore-1809/vs2002",
-      commands:
-      [
-        "echo $PWD %CD%",
-		"MSBuild -version",
-		"msbuild -version"
-      ]
-    },
-/*
-    {
-      name: "package",
-      image: "gcc",
-      commands: [
-        "zip *.* zzz"
-      ]
-    }
-*/
-  ];
-
-
-[
 {
   kind: "pipeline",
   name: "Windows 64 build",
@@ -43,11 +13,14 @@ local Steps = [
     {
       name: "show environment",
       image: "dctl-registry.dcinet:5000/windows-servercore-1809/vs2022",
+      environment:
+        [
+			{ TEST_ENV_VAR: "${DRONE_COMMIT_MESSAGE}", },
+        ],
       commands:
       [
         "echo Hello_World",
         "dir env:",
-        "echo \"${DRONE_COMMIT_MESSAGE}\"",
       ]
     },
     {
@@ -59,7 +32,7 @@ local Steps = [
         file_exists: "overwrite",  // what to do if a file asset already exists,
                                 // supported values - overwrite, skip and fail.  string optional  Default: overwrite
         note: "Here is nothing",
-        title: "${DRONE_COMMIT_SHA}",
+//        title: ${DRONE_COMMIT_MESSAGE},
 //        insecure: true,        // visit base_url via insecure https protocol. boolean, optional. Default: false
                             // Perhaps we can read the secret for PLUGIN_BASE_URL and test for http://
 
@@ -76,4 +49,3 @@ local Steps = [
     }
   ]
 }
-]
