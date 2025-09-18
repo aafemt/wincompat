@@ -14,9 +14,7 @@
       name: "show environment",
       image: "dctl-registry.dcinet:5000/windows-servercore-1809/vs2022",
       environment:
-//        [
-			{ TEST_ENV_VAR: "${DRONE_COMMIT_MESSAGE}" },
-//        ],
+			{ TEST_ENV_VAR: "${CI_COMMIT_MESSAGE}" },
       commands:
       [
         "echo Hello_World",
