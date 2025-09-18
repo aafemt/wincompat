@@ -8,3 +8,5 @@ In contrast to WINE no binary compatibility intended.
 
 In contrast to WineLib result of compilation is supposed to be
 a native executable, not a library requiring WINE server.
+
+Do not expect much.
