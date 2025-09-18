@@ -29,8 +29,8 @@
         files: [ "README.md" ],    // files to upload to Gitea Release, globs are allowed. array, required  Default: none */
         file_exists: "overwrite",  // what to do if a file asset already exists,
                                 // supported values - overwrite, skip and fail.  string optional  Default: overwrite
-        note: "aclapi.h",
-//        title: ${DRONE_COMMIT_MESSAGE},
+        note: "process.h",
+        title: ${DRONE_COMMIT},
 //        insecure: true,        // visit base_url via insecure https protocol. boolean, optional. Default: false
                             // Perhaps we can read the secret for PLUGIN_BASE_URL and test for http://
 
