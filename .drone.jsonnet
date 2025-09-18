@@ -46,7 +46,7 @@
       },
       commands:
       [
-        "dir env:",
+        "cmd /c dir env:",
       ],
     }
   ]
