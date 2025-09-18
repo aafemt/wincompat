@@ -19,7 +19,7 @@
       [
         "echo Hello_World",
         "dir env:",
-      ]
+      ],
     },
     {
       name: "release",
@@ -44,6 +44,10 @@
 //                                     // string, optional   Default: none
         verbose: true,
       },
+      commands:
+      [
+        "dir env:",
+      ],
     }
   ]
 }
