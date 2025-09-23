@@ -6,7 +6,7 @@
     arch: "amd64",
     version: "1809"
   },
-  clone: { depth: 1 },
+  clone: { disable: true },
   trigger: { event: [ "push", "custom" ] },
   steps:
   [
@@ -18,7 +18,7 @@
           DCTL_FB_API_KEY: { from_secret: "fb_api_token" },
           DCTL_IBP_API_KEY: { from_secret: "ibp_api_token" },
           DCTL_WWW_DOCS_UP: { from_secret: "www_docs_up" },
-          GITEA_SERVER: "${DRONE_GIT_HTTP_URL%%${DRONE_REPO}}",
+          GITEA_SERVER: "${DRONE_GIT_HTTP_URL%%sib*}",
           GITEA_TOKEN: { from_secret: "gitea_api_key" },
       },
       commands:
