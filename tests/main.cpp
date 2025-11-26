@@ -11,12 +11,15 @@
 #include "find.h"
 #include "nls.h"
 
+void RunPathTests();
+
 int main()
 {
 	setlocale(LC_ALL, "");
 
 	RunFindTests();
 	RunNlsTests();
+	RunPathTests();
 
 	if (failed)
 	{

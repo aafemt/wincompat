@@ -20,7 +20,7 @@ void checkLocaleInfo(LCID locale, LCTYPE value, const wchar_t* expected, DWORD e
 		DWORD err = GetLastError();
 		if (err != expectError)
 		{
-			failure("Failed to get name for locale %u, constant %u. Error %lu, expected %lu", (unsigned)locale, (unsigned)value, err, expectError);
+			failure("Failed to get name for locale %u, constant %u. Error %lu, expected %lu\n", (unsigned)locale, (unsigned)value, err, expectError);
 		}
 		return;
 	}

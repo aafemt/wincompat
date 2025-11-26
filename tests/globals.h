@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdio.h>
+
 inline bool failed = false;
 inline unsigned failures = 0;
 

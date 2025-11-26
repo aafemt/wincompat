@@ -17,6 +17,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-mthreads" />
+					<Add library="shlwapi" />
 				</Linker>
 			</Target>
 			<Target title="Linux">
@@ -133,6 +134,9 @@
 		<Unit filename="../shlobj.h">
 			<Option target="Linux" />
 		</Unit>
+		<Unit filename="../shlwapi.cpp">
+			<Option target="Linux" />
+		</Unit>
 		<Unit filename="../shlwapi.h">
 			<Option target="Linux" />
 		</Unit>
@@ -178,6 +182,7 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="nls.cpp" />
 		<Unit filename="nls.h" />
+		<Unit filename="path.cpp" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

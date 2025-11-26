@@ -18,3 +18,25 @@ inline WINBOOL PathRemoveFileSpec(char* pszPath)
 	}
 	return 0;
 }
+
+const wchar_t* PathFindFileName(const wchar_t* pszPath);
+const char* PathFindFileName(const char* pszPath);
+inline const char* PathFindFileNameA(const char* pszPath)
+{
+	return PathFindFileName(pszPath);
+}
+inline const wchar_t* PathFindFileNameW(const wchar_t* pszPath)
+{
+	return PathFindFileName(pszPath);
+}
+
+WINBOOL PathIsDirectory(const wchar_t* pszPath);
+WINBOOL PathIsDirectory(const char* pszPath);
+inline WINBOOL PathIsDirectoryA(const wchar_t* pszPath)
+{
+	return PathIsDirectory(pszPath);
+}
+inline WINBOOL PathIsDirectoryW(const char* pszPath)
+{
+	return PathIsDirectory(pszPath);
+}
