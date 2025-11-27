@@ -101,6 +101,9 @@
 		<Unit filename="../process.h">
 			<Option target="Linux" />
 		</Unit>
+		<Unit filename="../processenv.cpp">
+			<Option target="Linux" />
+		</Unit>
 		<Unit filename="../processthreadsapi.h">
 			<Option target="Linux" />
 		</Unit>

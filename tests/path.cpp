@@ -18,9 +18,9 @@ void checkFileName(const char* path, const char* filename)
 	}
 }
 
-void checkIsDirectory(const char* path, BOOL expectedResult)
+void checkIsDirectory(const char* path, WINBOOL expectedResult)
 {
-	BOOL result = PathIsDirectoryA(path);
+	WINBOOL result = PathIsDirectoryA(path);
 	if (result != expectedResult)
 	{
 		failure("PathIsDirectory(%s) returned %d instead of %d\n", path, result, expectedResult);
@@ -33,6 +33,7 @@ void RunPathTests()
 	checkFileName("/path/file", "file");
 	checkFileName("/path/", "path/");
 	checkFileName("/path", "path");
+	checkFileName("/", "/");
 	checkFileName("/path/.ext", ".ext");
 	checkFileName(".", ".");
 	checkFileName("file.ext", "file.ext");
@@ -51,11 +52,11 @@ void RunPathTests()
 		failure("GetCurrentDirectory returned error %lu\n", GetLastError());
 		return;
 	}
-	checkIsDirectory(buffer, (BOOL)FILE_ATTRIBUTE_DIRECTORY);
+	checkIsDirectory(buffer, (WINBOOL)FILE_ATTRIBUTE_DIRECTORY);
 	// Force separator at the end and try again, result must be the same
 	buffer[l++] = '/';
 	buffer[l] = '\0';
-	checkIsDirectory(buffer, (BOOL)FILE_ATTRIBUTE_DIRECTORY);
+	checkIsDirectory(buffer, (WINBOOL)FILE_ATTRIBUTE_DIRECTORY);
 	// Valid but non-existing path must return FALSE
 	buffer[l++] = 'n';
 	buffer[l] = '\0';

@@ -3,7 +3,7 @@
 #include <string.h>
 #include "windef.h"
 
-WINBOOL PathIsRelative(const char* lpszPath)
+inline WINBOOL PathIsRelative(const char* lpszPath)
 {
    return *lpszPath == '/'?FALSE:TRUE;
 }
@@ -32,7 +32,7 @@ inline const wchar_t* PathFindFileNameW(const wchar_t* pszPath)
 
 WINBOOL PathIsDirectory(const wchar_t* pszPath);
 WINBOOL PathIsDirectory(const char* pszPath);
-inline WINBOOL PathIsDirectoryA(const wchar_t* pszPath)
+inline WINBOOL PathIsDirectoryA(const char* pszPath)
 {
 	return PathIsDirectory(pszPath);
 }

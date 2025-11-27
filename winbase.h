@@ -83,3 +83,9 @@ inline HLOCAL LocalFree(HLOCAL hMem)
 		free(hMem);
 	return nullptr;
 }
+
+DWORD GetCurrentDirectory(DWORD nBufferLength, char* lpBuffer);
+inline DWORD GetCurrentDirectoryA(DWORD nBufferLength, char* lpBuffer)
+{
+	return GetCurrentDirectory(nBufferLength, lpBuffer);
+}
