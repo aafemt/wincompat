@@ -12,6 +12,7 @@
 #include "nls.h"
 
 void RunPathTests();
+void RunSyncTests();
 
 int main()
 {
@@ -20,6 +21,7 @@ int main()
 	RunFindTests();
 	RunNlsTests();
 	RunPathTests();
+	RunSyncTests();
 
 	if (failed)
 	{

@@ -186,6 +186,7 @@
 		<Unit filename="nls.cpp" />
 		<Unit filename="nls.h" />
 		<Unit filename="path.cpp" />
+		<Unit filename="sync.cpp" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
