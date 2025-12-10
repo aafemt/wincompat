@@ -59,7 +59,15 @@ void RunSyncTests()
 	}
 	if (res != WAIT_TIMEOUT)
 	{
-		failure("Console event wait returned %lu instead of timeout\n", res);
+		if (res == WAIT_FAILED)
+		{
+			res = GetLastError();
+			failure("Console event wait returned error %lx instead of timeout\n", res);
+		}
+		else
+		{
+			failure("Console event wait returned %lx instead of timeout\n", res);
+		}
 	}
 	CloseHandle(thread);
 	CloseHandle(event);
@@ -68,5 +76,13 @@ void RunSyncTests()
 	{
 		failure("Error unsetting user-side Ctrl-C handler. Error %lu\n", GetLastError());
 		return;
+	}
+	if (SetConsoleCtrlHandler(CtrlHandler, FALSE) != 0)
+	{
+		DWORD err = GetLastError();
+		if (err != ERROR_INVALID_PARAMETER)
+		{
+			failure("Error unsetting non-user Ctrl-C handler. Error %lu instead of ERROR_INVALID_PARAMETER\n", err);
+		}
 	}
 }

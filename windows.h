@@ -11,15 +11,13 @@
 #include "windef.h"
 #include "winnls.h"
 #include "winuser.h"
+#include "wincon.h"
+
+#ifndef WIN32_LEAN_AND_MEAN
+#include "rpc.h"
+#endif // WIN32_LEAN_AND_MEAN
 
 /* Windows compatibility header */
-
-// Do we really need compatibility of calling conventions...?
-#ifdef __x86_64__
-#define WINAPI
-#else
-#define WINAPI __attribute__((__stdcall__))
-#endif // __x86_64__
 
 // This bit flag has no use on Linux, so define it to zero to make it no-op
 const int O_BINARY = 0;

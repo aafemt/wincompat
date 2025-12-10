@@ -31,7 +31,11 @@ DWORD WaitForSingleObject(HANDLE hHandle, DWORD dwMilliseconds)
     }
 
     timespec b;
-    clock_gettime(CLOCK_MONOTONIC_RAW, &b);
+    if (clock_gettime(CLOCK_MONOTONIC_RAW, &b) != 0)
+    {
+        return WAIT_FAILED;
+    }
+
     while (true)
     {
         pollfd fd = { hHandle->GetWaitableHandle(), POLLIN, 0 };
@@ -43,6 +47,12 @@ DWORD WaitForSingleObject(HANDLE hHandle, DWORD dwMilliseconds)
         switch (poll(&fd, 1, dwMilliseconds))
         {
         case -1:
+            // WaitFor* is not interrupted by signals
+            if (errno == EINTR)
+            {
+                // Still need to adjust timeout
+                break;
+            }
             return WAIT_FAILED;
         case 0:
             return WAIT_TIMEOUT;
@@ -62,6 +72,10 @@ DWORD WaitForSingleObject(HANDLE hHandle, DWORD dwMilliseconds)
             dwMilliseconds -= (e.tv_sec - b.tv_sec) * 1000;
             dwMilliseconds -= (e.tv_nsec - b.tv_nsec) / 1000000;
             b = e;
+        }
+        else
+        {
+            return WAIT_FAILED;
         }
     }
 }
@@ -96,6 +110,11 @@ DWORD WaitForMultipleObjects(DWORD nCount, HANDLE* lpHandles, WINBOOL bWaitAll, 
         {
         case -1:
             //printf("poll wait failed\n");
+            if (errno == EINTR)
+            {
+                // Still need to adjust timeout
+                break;
+            }
             return WAIT_FAILED;
         case 0:
             //printf("poll wait timeouted\n");
