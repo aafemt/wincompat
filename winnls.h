@@ -7,9 +7,11 @@
 #define CP_UTF8     65001
 
 typedef nl_item LCTYPE;
+// May be it should be `const char*` instead to let "make" macros to form something like "en_us" directly...
 typedef unsigned LCID;
 
 constexpr LCID LOCALE_INVARIANT = 0;
+constexpr LCID LOCALE_USER_DEFAULT = 1;
 
 constexpr LCTYPE LOCALE_SMONTHNAME1 = MON_1;
 constexpr LCTYPE LOCALE_SMONTHNAME2 = MON_2;
@@ -52,6 +54,11 @@ constexpr LCTYPE LOCALE_SABBREVDAYNAME4 = ABDAY_5;
 constexpr LCTYPE LOCALE_SABBREVDAYNAME5 = ABDAY_6;
 constexpr LCTYPE LOCALE_SABBREVDAYNAME6 = ABDAY_7;
 constexpr LCTYPE LOCALE_SABBREVDAYNAME7 = ABDAY_1;
+
+constexpr LCTYPE LOCALE_SDECIMAL = RADIXCHA;
+constexpr LCTYPE LOCALE_STHOUSAND = THOUSEP;
+//constexpr LCTYPE LOCALE_SPOSITIVESIGN = ???
+//constexpr LCTYPE LOCALE_SNEGATIVESIGN = ???
 
 int GetLocaleInfo(LCID locale, LCTYPE LCType, wchar_t* lpLCData, int cchData);
 inline int GetLocaleInfoW(LCID locale, LCTYPE LCType, wchar_t* lpLCData, int cchData)

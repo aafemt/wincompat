@@ -45,12 +45,13 @@ namespace
 
 	const std::string LocaleCache::getLocaleName(LCID loc)
 	{
-		if (loc == LOCALE_INVARIANT)
+		switch (loc)
 		{
+		case LOCALE_INVARIANT:
 			return "POSIX";
-		}
-		else
-		{
+		case LOCALE_USER_DEFAULT:
+			return "";
+		default:
 			return "SurelyNonExistingLocale";
 		}
 	}
@@ -62,7 +63,7 @@ namespace
 		auto itr = list.emplace(localeName, (locale_t)0);
 		if (itr.second)
 		{
-			itr.first->second = newlocale(LC_TIME_MASK, localeName.c_str(), (locale_t)0);
+			itr.first->second = newlocale(LC_TIME_MASK | LC_NUMERIC_MASK, localeName.c_str(), (locale_t)0);
 		}
 		locale_t result = itr.first->second; // Better to have it inside of lock to avoid iterator invalidation
 		pthread_mutex_unlock(&listGuard);
