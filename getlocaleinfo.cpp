@@ -63,7 +63,8 @@ namespace
 		auto itr = list.emplace(localeName, (locale_t)0);
 		if (itr.second)
 		{
-			itr.first->second = newlocale(LC_TIME_MASK | LC_NUMERIC_MASK, localeName.c_str(), (locale_t)0);
+			// NEGATIVE_SIGN and POSITIVE_SIGN are in LC_MONETARY
+			itr.first->second = newlocale(LC_TIME_MASK | LC_NUMERIC_MASK | LC_MONETARY_MASK, localeName.c_str(), (locale_t)0);
 		}
 		locale_t result = itr.first->second; // Better to have it inside of lock to avoid iterator invalidation
 		pthread_mutex_unlock(&listGuard);

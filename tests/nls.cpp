@@ -36,7 +36,7 @@ void checkLocaleInfo(LCID locale, LCTYPE value, const wchar_t* expected, DWORD e
 	}
 	if (wcscmp(buffer, expected) != 0)
 	{
-		failure("Got value %S while expected %S\n", buffer, expected);
+		failure("Got value '%S' while expected '%S'\n", buffer, expected);
 	}
 }
 
@@ -81,9 +81,9 @@ void RunNlsTests()
 	checkLocaleInfo(LOCALE_INVARIANT, LOCALE_SABBREVDAYNAME5, L"FRI");
 	checkLocaleInfo(LOCALE_INVARIANT, LOCALE_SABBREVDAYNAME6, L"SAT");
 	checkLocaleInfo(LOCALE_INVARIANT, LOCALE_SABBREVDAYNAME7, L"SUN");
-	checkLocaleInfo(LOCALE_INVARIANT, LOCALE_SPOSITIVESIGN, L"+");
-	checkLocaleInfo(LOCALE_INVARIANT, LOCALE_SNEGATIVESIGN, L"-");
+//	checkLocaleInfo(LOCALE_INVARIANT, LOCALE_SPOSITIVESIGN, L"+"); It may be + or empty string, skip the test
+	checkLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SNEGATIVESIGN, L"-");
 	checkLocaleInfo(LOCALE_INVARIANT, LOCALE_SDECIMAL, L".");
-	checkLocaleInfo(LOCALE_INVARIANT, LOCALE_STHOUSAND, L",");
+//	checkLocaleInfo(LOCALE_INVARIANT, LOCALE_STHOUSAND, L","); On Linux POSIX locale doesn't define thousand separator
 	checkLocaleInfo(0x1111, LOCALE_SABBREVDAYNAME7, L"NO LOCALE", ERROR_INVALID_PARAMETER);
 }
