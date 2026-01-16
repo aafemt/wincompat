@@ -89,3 +89,25 @@ inline DWORD GetCurrentDirectoryA(DWORD nBufferLength, char* lpBuffer)
 {
 	return GetCurrentDirectory(nBufferLength, lpBuffer);
 }
+
+DWORD GetEnvironmentVariable(const char* lpName, char* lpBuffer, DWORD nSize);
+DWORD GetEnvironmentVariable(const wchar_t* lpName, wchar_t* lpBuffer, DWORD nSize);
+inline DWORD GetEnvironmentVariableA(const char* lpName, char* lpBuffer, DWORD nSize)
+{
+	return GetEnvironmentVariable(lpName, lpBuffer, nSize);
+}
+inline DWORD GetEnvironmentVariableW(const wchar* lpName, wchar_t* lpBuffer, DWORD nSize)
+{
+	return GetEnvironmentVariable(lpName, lpBuffer, nSize);
+}
+
+BOOL SetEnvironmentVariable(const char* lpName, const char* lpValue);
+BOOL SetEnvironmentVariable(const wchar_t* lpName, const wchar_t* lpValue);
+inline BOOL SetEnvironmentVariableA(const char* lpName, const char* lpValue)
+{
+	SetEnvironmentVariable(lpName, lpValue);
+}
+BOOL SetEnvironmentVariableW(const wchar_t* lpName, const wchar_t* lpValue)
+{
+	SetEnvironmentVariable(lpName, lpValue);
+}

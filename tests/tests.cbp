@@ -185,6 +185,7 @@
 		<Unit filename="../ws2tcpip.h">
 			<Option target="Linux" />
 		</Unit>
+		<Unit filename="env.cpp" />
 		<Unit filename="find.cpp" />
 		<Unit filename="find.h" />
 		<Unit filename="globals.h" />

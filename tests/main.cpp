@@ -11,6 +11,7 @@
 #include "find.h"
 #include "nls.h"
 
+void RunEnvTests();
 void RunPathTests();
 void RunSyncTests();
 
@@ -18,6 +19,7 @@ int main()
 {
 	setlocale(LC_ALL, "");
 
+	RunEnvTests();
 	RunFindTests();
 	RunNlsTests();
 	RunPathTests();
