@@ -60,7 +60,7 @@ void RunEnvTests()
 		failure("GetEnvironmentVariableW returned %S instead of unicode text\n", wbuffer);
 	}
 
-	// Test variable ersing
+	// Test variable erasing
 	if (SetEnvironmentVariableA("TestWideVar", nullptr) == FALSE)
 	{
 		failure("Erasing variable returned error %lu\n", GetLastError());
@@ -76,6 +76,16 @@ void RunEnvTests()
 	else if (err != ERROR_ENVVAR_NOT_FOUND)
 	{
 		failure("Getting of non-existing variable returned error %lu instead of ERROR_ENVVAR_NOT_FOUND\n", err);
+	}
+	res = GetEnvironmentVariableW(L"TestWideVar", wbuffer, 20);
+	err = GetLastError();
+	if (res != 0)
+	{
+		failure("Getting of non-existing variable as wide string returned %lu instead of zero\n", res);
+	}
+	else if (err != ERROR_ENVVAR_NOT_FOUND)
+	{
+		failure("Getting of non-existing variable as wide string returned error %lu instead of ERROR_ENVVAR_NOT_FOUND\n", err);
 	}
 
 	// Test buffer overflow
