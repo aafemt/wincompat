@@ -6,8 +6,16 @@
 
 #include <windows.h>
 #include <shlwapi.h>
+#include <pathcch.h>
+#include <wchar.h>
 
 #include "globals.h"
+
+#ifdef __WIN32__
+#define DIR_SEP L"\\"
+#else
+#define DIR_SEP L"/"
+#endif // __WIN32__
 
 void checkFileName(const char* path, const char* filename)
 {
@@ -15,6 +23,21 @@ void checkFileName(const char* path, const char* filename)
 	if (strcmp(result, filename) != 0)
 	{
 		failure("PathFindFileName(%s) == %s instead of %s\n", path, result, filename);
+	}
+}
+
+void checkRemoveFileName(const wchar_t* path, const wchar_t* result, HRESULT returnCode = S_OK)
+{
+	wchar_t tmp[1024];
+	wcscpy(tmp, path);
+	HRESULT res = PathCchRemoveFileSpec(tmp, sizeof(tmp));
+	if (res != returnCode)
+	{
+		failure("PathCchRemoveFileSpec returned %x instead of S_OK\n", res);
+	}
+	else if (wcscmp(tmp, result) != 0)
+	{
+		failure("PathCchRemoveFileSpec returned %S instead of %S\n", tmp, result);
 	}
 }
 
@@ -37,6 +60,24 @@ void RunPathTests()
 	checkFileName("/path/.ext", ".ext");
 	checkFileName(".", ".");
 	checkFileName("file.ext", "file.ext");
+
+	// PathCchRemoveFileName doesn't recognize slash as a dir separator on Windows
+	checkRemoveFileName(DIR_SEP L"path1", DIR_SEP);
+	checkRemoveFileName(DIR_SEP L"path1" DIR_SEP "path2", DIR_SEP L"path1");
+	checkRemoveFileName(DIR_SEP L"path1" DIR_SEP, DIR_SEP L"path1");
+	checkRemoveFileName(DIR_SEP, DIR_SEP, S_FALSE);
+	checkRemoveFileName(L"no path", L"");
+	HRESULT res = PathCchRemoveFileSpec(nullptr, 1);
+	if (res != E_INVALIDARG)
+	{
+		failure("PathCchRemoveFileSpec(nullptr) returned %x instead of E_INVALIDARG\n", res);
+	}
+	wchar_t wbuffer[1024];
+	res = PathCchRemoveFileSpec(wbuffer, 0);
+	if (res != E_INVALIDARG)
+	{
+		failure("PathCchRemoveFileSpec(0) returned %x instead of E_INVALIDARG\n", res);
+	}
 
 	// Let's use executable name as an existing non-direcctory
 	char buffer[MAX_PATH];

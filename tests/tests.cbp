@@ -86,6 +86,9 @@
 		<Unit filename="../handleapi.h">
 			<Option target="Linux" />
 		</Unit>
+		<Unit filename="../intrin.h">
+			<Option target="Linux" />
+		</Unit>
 		<Unit filename="../libloaderapi.cpp">
 			<Option target="Linux" />
 		</Unit>
@@ -93,6 +96,15 @@
 			<Option target="Linux" />
 		</Unit>
 		<Unit filename="../mbstowcs_l.cpp">
+			<Option target="Linux" />
+		</Unit>
+		<Unit filename="../nmmintrin.h">
+			<Option target="Linux" />
+		</Unit>
+		<Unit filename="../pathcch.cpp">
+			<Option target="Linux" />
+		</Unit>
+		<Unit filename="../pathcch.h">
 			<Option target="Linux" />
 		</Unit>
 		<Unit filename="../process.cpp">
