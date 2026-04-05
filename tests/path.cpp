@@ -41,6 +41,26 @@ void checkRemoveFileName(const wchar_t* path, const wchar_t* result, HRESULT ret
 	}
 }
 
+void checkAddBackslash(const wchar_t* path, size_t length, HRESULT expectedReturn, const wchar_t* expectedResult)
+{
+	wchar_t tmp[length + 1];
+	tmp[length] = L'\xdead';
+	wcsncpy(tmp, path, length);
+	HRESULT res = PathCchAddBackslash(tmp, length);
+	if (tmp[length] != L'\xdead')
+	{
+		failure("PathCchAddBackslash run aout of buffer\n");
+	}
+	if (res != expectedReturn)
+	{
+		failure("PathCchAddBackslash returned %x instead of %x\n", res, expectedReturn);
+	}
+	else if (expectedResult != nullptr && wcscmp(tmp, expectedResult) != 0)
+	{
+		failure("PathCchAddBackslash returned %S instead of %S\n", tmp, expectedResult);
+	}
+}
+
 void checkIsDirectory(const char* path, WINBOOL expectedResult)
 {
 	WINBOOL result = PathIsDirectoryA(path);
@@ -78,6 +98,14 @@ void RunPathTests()
 	{
 		failure("PathCchRemoveFileSpec(0) returned %x instead of E_INVALIDARG\n", res);
 	}
+
+	checkAddBackslash(L"path", 10, S_OK, L"path" DIR_SEP);
+	checkAddBackslash(L"path" DIR_SEP, 10, S_FALSE, L"path" DIR_SEP);
+	// Corner cases
+	checkAddBackslash(L"path" DIR_SEP, 0, E_NOT_SUFFICIENT_BUFFER, nullptr);
+	checkAddBackslash(L"path" DIR_SEP, 3, E_NOT_SUFFICIENT_BUFFER, nullptr);
+	checkAddBackslash(L"path" DIR_SEP, 5, E_NOT_SUFFICIENT_BUFFER, nullptr); // This case is funny because buffer IS enough
+	checkAddBackslash(L"", 5, S_FALSE, L""); // This case is even more funny
 
 	// Let's use executable name as an existing non-direcctory
 	char buffer[MAX_PATH];
