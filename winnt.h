@@ -16,7 +16,7 @@ union LARGE_INTEGER
 
 struct handle_t;
 typedef handle_t* HANDLE;
-typedef int HRESULT;
+typedef long HRESULT; // To keep printf formal compatible
 
 typedef wchar_t WCHAR;	// may be it is better to make it char16_t?..
 typedef WCHAR *LPWSTR;

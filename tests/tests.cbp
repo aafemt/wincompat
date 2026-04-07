@@ -18,6 +18,7 @@
 				<Linker>
 					<Add option="-mthreads" />
 					<Add library="shlwapi" />
+					<Add library="pathcch" />
 				</Linker>
 			</Target>
 			<Target title="Linux">

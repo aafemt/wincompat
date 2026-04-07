@@ -33,7 +33,7 @@ void checkRemoveFileName(const wchar_t* path, const wchar_t* result, HRESULT ret
 	HRESULT res = PathCchRemoveFileSpec(tmp, sizeof(tmp));
 	if (res != returnCode)
 	{
-		failure("PathCchRemoveFileSpec returned %x instead of S_OK\n", res);
+		failure("PathCchRemoveFileSpec returned %lx instead of S_OK\n", res);
 	}
 	else if (wcscmp(tmp, result) != 0)
 	{
@@ -53,7 +53,7 @@ void checkAddBackslash(const wchar_t* path, size_t length, HRESULT expectedRetur
 	}
 	if (res != expectedReturn)
 	{
-		failure("PathCchAddBackslash returned %x instead of %x\n", res, expectedReturn);
+		failure("PathCchAddBackslash returned %lx instead of %lx\n", res, expectedReturn);
 	}
 	else if (expectedResult != nullptr && wcscmp(tmp, expectedResult) != 0)
 	{
@@ -90,13 +90,13 @@ void RunPathTests()
 	HRESULT res = PathCchRemoveFileSpec(nullptr, 1);
 	if (res != E_INVALIDARG)
 	{
-		failure("PathCchRemoveFileSpec(nullptr) returned %x instead of E_INVALIDARG\n", res);
+		failure("PathCchRemoveFileSpec(nullptr) returned %lx instead of E_INVALIDARG\n", res);
 	}
 	wchar_t wbuffer[1024];
 	res = PathCchRemoveFileSpec(wbuffer, 0);
 	if (res != E_INVALIDARG)
 	{
-		failure("PathCchRemoveFileSpec(0) returned %x instead of E_INVALIDARG\n", res);
+		failure("PathCchRemoveFileSpec(0) returned %lx instead of E_INVALIDARG\n", res);
 	}
 
 	checkAddBackslash(L"path", 10, S_OK, L"path" DIR_SEP);
