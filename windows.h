@@ -1,6 +1,5 @@
 #pragma once
 
-#include <errno.h>
 #include <stdlib.h>
 #include <sys/inotify.h>
 
@@ -21,11 +20,6 @@
 
 // This bit flag has no use on Linux, so define it to zero to make it no-op
 const int O_BINARY = 0;
-
-inline DWORD GetLastError()
-{
-    return errno;
-}
 
 HANDLE CreateEvent(void*, WINBOOL bManualReset, WINBOOL bInitialState, char*);
 WINBOOL SetEvent(HANDLE event);
