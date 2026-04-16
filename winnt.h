@@ -54,6 +54,13 @@ constexpr DWORD FILE_ATTRIBUTE_NORMAL	= 0x00000080L;
 constexpr DWORD FILE_ATTRIBUTE_TEMPORARY = 0x00000100L;
 constexpr DWORD FILE_ATTRIBUTE_REPARSE_POINT = 0x00000400L;
 
+constexpr DWORD DLL_PROCESS_ATTACH = 1;
+[[deprecated("Linux has no hooks on process start/stop")]]
+constexpr DWORD DLL_THREAD_ATTACH = 2;
+[[deprecated("Linux has no hooks on process start/stop")]]
+constexpr DWORD DLL_THREAD_DETACH = 3;
+constexpr DWORD DLL_PROCESS_DETACH = 4;
+
 // There is no point to repeat whole structure because direct access to fields is discouraged
 // by MS
 struct SID

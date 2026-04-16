@@ -16,16 +16,20 @@
 #define WINAPI __attribute__((__stdcall__))
 #endif // __x86_64__
 
+#define APIENTRY WINAPI
+
 typedef int WINBOOL;
 typedef int BOOL;
 // It is ABI incompatibility, but we don't care. The main purpose is source compatibility
 // and damned DWORD on Windows is defined as "unsigned long int" that makes format strings crazy.
 typedef unsigned long int DWORD;
 typedef DWORD* LPDWORD;
-typedef void* HMODULE;
+typedef void* HINSTANCE;
+typedef HINSTANCE HMODULE;
 typedef void* HWND;
 typedef unsigned short WORD;
 typedef unsigned char BYTE;
+typedef void* LPVOID;
 
 inline WORD MAKEWORD(BYTE a, BYTE b) { return a | static_cast<WORD>(b) << 8; }
 inline BYTE LOBYTE(WORD w) { return w & 0xff; }

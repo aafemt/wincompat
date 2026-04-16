@@ -4,7 +4,7 @@
 
 #include "windef.h"
 
-inline HMODULE LoadLibrary(const char* lpFileName) { return dlopen(lpFileName, RTLD_LAZY | RTLD_LOCAL); }
+HMODULE LoadLibrary(const char* lpFileName);
 inline void* GetProcAddress(HMODULE hModule, const char* lpProcName)
 {
     return dlsym(hModule, lpProcName);

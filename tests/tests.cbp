@@ -36,6 +36,7 @@
 					<Add option="-pthread" />
 					<Add library="xcb" />
 					<Add library="rt" />
+					<Add library="dl" />
 				</Linker>
 			</Target>
 		</Build>
@@ -201,6 +202,7 @@
 		<Unit filename="../ws2tcpip.h">
 			<Option target="Linux" />
 		</Unit>
+		<Unit filename="dll.cpp" />
 		<Unit filename="env.cpp" />
 		<Unit filename="find.cpp" />
 		<Unit filename="find.h" />

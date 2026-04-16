@@ -4,6 +4,7 @@
 
 #include "windef.h"
 #include "winnt.h"
+#include "errhandlingapi.h"
 #include "handleapi.h"
 #include "processthreadsapi.h"
 #include "securitybaseapi.h"

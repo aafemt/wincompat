@@ -14,6 +14,7 @@
 void RunEnvTests();
 void RunPathTests();
 void RunSyncTests();
+void RunDllTests();
 
 int main()
 {
@@ -24,6 +25,7 @@ int main()
 	RunNlsTests();
 	RunPathTests();
 	RunSyncTests();
+	RunDllTests();
 
 	if (failed)
 	{

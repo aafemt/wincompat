@@ -11,12 +11,6 @@
 
 #include "globals.h"
 
-#ifdef __WIN32__
-#define DIR_SEP L"\\"
-#else
-#define DIR_SEP L"/"
-#endif // __WIN32__
-
 void checkFileName(const char* path, const char* filename)
 {
 	const char* result = PathFindFileNameA(path);
