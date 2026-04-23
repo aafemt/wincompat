@@ -32,7 +32,7 @@ void RunDllTests()
 		failure("Test DLL without extension failed to load\n");
 		return;
 	}
-	decltype(getHandle)* func = reinterpret_cast<decltype(getHandle)*>(GetProcAddress(lib, "getHandle"));
+	decltype(getHandle)* func = reinterpret_cast<decltype(getHandle)*>(reinterpret_cast<void*>(GetProcAddress(lib, "getHandle")));
 	if (func == nullptr)
 	{
 		failure("getHandle function not found\n");

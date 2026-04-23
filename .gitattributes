@@ -2,3 +2,4 @@
 *.h	text
 *.cpp	text
 *.cbp	text eol=lf
+*.jsonnet	text

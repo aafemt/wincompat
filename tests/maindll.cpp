@@ -7,7 +7,12 @@ namespace
 
 extern "C"
 {
-	__attribute__((visibility("protected"))) HMODULE getHandle();
+#ifdef __WIN32__
+	__declspec(dllexport)
+#else
+	__attribute__((visibility("protected")))
+#endif // __WIN32__
+	HMODULE getHandle();
 	HMODULE getHandle()
 	{
 		return thisInstance;

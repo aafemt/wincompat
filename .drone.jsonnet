@@ -22,8 +22,8 @@
       },
       commands:
       [
-        "echo Hello_World",
         "dir env:",
+		"cbp2make --version",
       ],
     },
   ]
