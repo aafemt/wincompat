@@ -23,7 +23,7 @@
       commands:
       [
         "dir env:",
-		"cbp2make --version",
+		"& cbp2make --version",
       ],
     },
   ]
