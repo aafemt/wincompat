@@ -5,6 +5,15 @@
 #include "windef.h"
 
 HMODULE LoadLibrary(const char* lpFileName);
+HMODULE LoadLibrary(const wchar_t* lpFileName);
+inline HMODULE LoadLibraryA(const char* lpFileName)
+{
+	return LoadLibrary(lpFileName);
+}
+inline HMODULE LoadLibraryW(const wchar_t* lpFileName)
+{
+	return LoadLibrary(lpFileName);
+}
 inline void* GetProcAddress(HMODULE hModule, const char* lpProcName)
 {
     return dlsym(hModule, lpProcName);

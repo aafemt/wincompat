@@ -29,6 +29,16 @@ void RunDllTests()
 		FreeLibrary(lib);
 		return;
 	}
+	HMODULE lib3 = LoadLibrary("testdll");
+	if (lib == nullptr)
+	{
+		failure("Test DLL failed to load from executable path\n");
+		return;
+	}
+	else
+	{
+		FreeLibrary(lib3);
+	}
 	decltype(getHandle)* func = reinterpret_cast<decltype(getHandle)*>(reinterpret_cast<void*>(GetProcAddress(lib, "getHandle")));
 	if (func == nullptr)
 	{
