@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <windows.h>
+#include <pathcch.h>
 
 #include "globals.h"
 
@@ -29,7 +30,7 @@ void RunDllTests()
 		FreeLibrary(lib);
 		return;
 	}
-	HMODULE lib3 = LoadLibrary("testdll");
+	HMODULE lib3 = LoadLibraryA("testdll");
 	if (lib == nullptr)
 	{
 		failure("Test DLL failed to load from executable path\n");
@@ -56,6 +57,42 @@ void RunDllTests()
 			failure("Library loaded with different pathes are different (%p vs %p)\n", lib, lib2);
 		}
 	}
+
+	wchar_t exeName[PATH_MAX];
+	DWORD exeNameLen = GetModuleFileName(nullptr, exeName, sizeof(exeName));
+	if (exeNameLen == 0 || exeNameLen >= sizeof(exeName))
+	{
+		failure("GetModuleFileName returned error %ld for executable name\n", GetLastError());
+	}
+	else
+	{
+		wchar_t libraryName[PATH_MAX];
+		DWORD libraryNameLen = GetModuleFileName(lib, libraryName, sizeof(libraryName));
+		if (libraryNameLen == 0 || libraryNameLen >= sizeof(libraryName))
+		{
+			failure("GetModuleFileName returned error %ld for library name\n", GetLastError());
+		}
+		else
+		{
+			HRESULT res;
+			if ((res = PathCchRemoveFileSpec(exeName, sizeof(exeName))) != S_OK)
+			{
+				failure("PathCchRemoveFileSpec returned %lx instead of S_OK for executable name %S\n", res, exeName);
+			}
+			else if ((res = PathCchRemoveFileSpec(libraryName, sizeof(libraryName))) != S_OK)
+			{
+				failure("PathCchRemoveFileSpec returned %lx instead of S_OK for library name %S\n", res, libraryName);
+			}
+			else
+			{
+				if (wcscmp(exeName, libraryName) != 0)
+				{
+					failure("Executable path %S is not the same as library path %S\n", exeName, libraryName);
+				}
+			}
+		}
+	}
+
 	FreeLibrary(lib2);
 	FreeLibrary(lib);
 
