@@ -1,6 +1,8 @@
+#include <array>
 #include <stdlib.h>
 #include <windows.h>
 #include <pathcch.h>
+#include <wchar.h>
 
 #include "globals.h"
 
@@ -59,7 +61,7 @@ void RunDllTests()
 	}
 
 	wchar_t exeName[PATH_MAX];
-	DWORD exeNameLen = GetModuleFileName(nullptr, exeName, sizeof(exeName));
+	DWORD exeNameLen = GetModuleFileName(nullptr, exeName, std::size(exeName));
 	if (exeNameLen == 0 || exeNameLen >= sizeof(exeName))
 	{
 		failure("GetModuleFileName returned error %ld for executable name\n", GetLastError());
@@ -67,7 +69,7 @@ void RunDllTests()
 	else
 	{
 		wchar_t libraryName[PATH_MAX];
-		DWORD libraryNameLen = GetModuleFileName(lib, libraryName, sizeof(libraryName));
+		DWORD libraryNameLen = GetModuleFileName(lib, libraryName, std::size(libraryName));
 		if (libraryNameLen == 0 || libraryNameLen >= sizeof(libraryName))
 		{
 			failure("GetModuleFileName returned error %ld for library name\n", GetLastError());

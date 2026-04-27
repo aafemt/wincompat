@@ -1,6 +1,9 @@
+#include <memory>
 #include <string>
 #include <string.h>
 #include <unistd.h>
+#include <dlfcn.h>
+#include <link.h>
 
 #include "libloaderapi.h"
 #include "winerror.h"
@@ -129,7 +132,72 @@ DWORD GetModuleFileName(HMODULE hModule, char* lpFileName, DWORD nSize)
 	}
 	else
 	{
-		errno = ERROR_CALL_NOT_IMPLEMENTED;
-		return 0;
+		link_map* map = nullptr;
+		errno = 0;
+		int res = dlinfo(hModule, RTLD_DI_LINKMAP, &map);
+		if (res != 0)
+		{
+			// The problem is that dlinfo hardly set errno.
+			if (errno == 0)
+			{
+				errno = ERROR_INVALID_HANDLE;
+			}
+			return 0;
+		}
+		if (map == nullptr || map->l_name == nullptr)
+		{
+			errno = ERROR_INVALID_HANDLE;
+			return 0;
+		}
+		char buffer[MAX_PATH];
+		errno = 0;
+		res = dlinfo(hModule, RTLD_DI_ORIGIN, &buffer);
+		if (res != 0)
+		{
+			if (errno == 0)
+			{
+				errno = ERROR_INVALID_HANDLE;
+			}
+			return 0;
+		}
+		std::string fullPath(buffer);
+		fullPath += '/';
+		fullPath += map->l_name;
+		char* realPath = realpath(fullPath.c_str(), nullptr);
+		if (realPath == nullptr)
+		{
+			return 0;
+		}
+		size_t len = strlen(realPath);
+		strncpy(lpFileName, realPath, nSize);
+		if (len >= nSize)
+		{
+			len = nSize;
+			lpFileName[len - 1] = '\0';
+			errno = ERROR_INSUFFICIENT_BUFFER;
+		}
+		return len;
 	}
+}
+
+DWORD GetModuleFileName(HMODULE hModule, wchar_t* lpFileName, DWORD nSize)
+{
+	// For UTF-8 wide chars and multibyte chars are not mapped 1:1 so char[nSize] cannot work.
+	const size_t tmpSize = nSize * 4;
+	std::unique_ptr<char[]> tmp(new char[tmpSize]);
+	DWORD result = GetModuleFileName(hModule, tmp.get(), tmpSize);
+	if (result != 0 && result < tmpSize)
+	{
+		result = mbstowcs(lpFileName, tmp.get(), nSize);
+		if (result == (size_t)-1)
+		{
+			return 0; // And keep errno
+		}
+		if (result == nSize)
+		{
+			lpFileName[nSize - 1] = L'\0';
+			errno = ERROR_INSUFFICIENT_BUFFER;
+		}
+	}
+	return result;
 }
