@@ -9,7 +9,7 @@
 
 #include "globals.h"
 
-bool eventArrived = false;
+volatile bool eventArrived = false;
 
 static BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
 {
@@ -32,8 +32,183 @@ unsigned WINAPI Thread(void*)
 	return 0;
 }
 
+volatile bool threadStarted = false;
+volatile bool threadStopped = false;
+unsigned WINAPI ShortThread(void*)
+{
+	threadStarted = true;
+	return 1;
+}
+
+unsigned WINAPI LongerThread(void*)
+{
+	threadStarted = true;
+	Sleep(100);
+	threadStopped = true;
+	return 2;
+}
+
+unsigned WINAPI LongThread(void*)
+{
+	threadStarted = true;
+	Sleep(1000);
+	threadStopped = true;
+	return 3;
+}
+
 void RunSyncTests()
 {
+	// Test waiting for threads
+
+	// Test wait of already finished thread
+	threadStarted = false;
+	threadStopped = false;
+	unsigned tid = 0;
+	HANDLE thread = (HANDLE)_beginthreadex(nullptr, 0, ShortThread, nullptr, 0, &tid);
+	if (thread == 0)
+	{
+		failure("Short thread start error %d\n", errno);
+		return;
+	}
+	if (tid == 0)
+	{
+		failure("Thread is is zero\n");
+	}
+
+	while (!threadStarted)
+	{
+		Sleep(1);
+	}
+	Sleep(100); // Sleep some more to let thread really finish
+
+	DWORD res = WaitForSingleObject(thread, 100);
+	if (res != WAIT_OBJECT_0)
+	{
+		failure("Waiting for already stopped thread returned %lu instead of WAIT_OBJECT_0\n", res);
+	}
+	if (!GetExitCodeThread(thread, &res))
+	{
+		failure("GetExitCodeThread for already stopped thread returned error %lu\n", GetLastError());
+	}
+	if (res != 1)
+	{
+		failure("Already stopped thread exit code is %lu instead of 1\n", res);
+	}
+	if (!CloseHandle(thread))
+	{
+		failure("CloseHandle returned error %lu for already stopped thread\n", GetLastError());
+		return;
+	}
+
+	// Test wait for not stopped yet thread
+	threadStarted = false;
+	threadStopped = false;
+
+	thread = (HANDLE)_beginthreadex(nullptr, 0, LongerThread, nullptr, 0, nullptr);
+	if (thread == 0)
+	{
+		failure("Longer thread start error %d\n", errno);
+		return;
+	}
+
+	if (!GetExitCodeThread(thread, &res))
+	{
+		failure("GetExitCodeThread for running thread returned error %lu\n", GetLastError());
+	}
+	if (res != STILL_ACTIVE)
+	{
+		failure("Running thread exit code is %lu instead of STILL_ACTIVE\n", res);
+	}
+
+	res = WaitForSingleObject(thread, 0);
+	if (res != WAIT_TIMEOUT)
+	{
+		failure("Short waiting for running thread returned %lu instead of WAIT_TIMEOUT\n", res);
+	}
+
+	res = WaitForSingleObject(thread, 200);
+	if (res != WAIT_OBJECT_0)
+	{
+		failure("Longer waiting for running thread returned %lu instead of WAIT_OBJECT_0\n", res);
+	}
+	if (!GetExitCodeThread(thread, &res))
+	{
+		failure("GetExitCodeThread for longer thread returned error %lu\n", GetLastError());
+	}
+	if (res != 2)
+	{
+		failure("Longer thread exit code is %lu instead of 2\n", res);
+	}
+	if (!CloseHandle(thread))
+	{
+		failure("CloseHandle returned error %lu for longer thread\n", GetLastError());
+		return;
+	}
+
+	// Test that detached thread finish work
+	threadStarted = false;
+	threadStopped = false;
+
+	thread = (HANDLE)_beginthreadex(nullptr, 0, LongerThread, nullptr, 0, nullptr);
+	if (thread == 0)
+	{
+		failure("Longer thread start error %d\n", errno);
+		return;
+	}
+	if (!CloseHandle(thread))
+	{
+		failure("CloseHandle returned error %lu for detached longer thread\n", GetLastError());
+	}
+	for (int i = 0; i < 4; ++i)
+	{
+		if (!threadStopped)
+		{
+			Sleep(100);
+		}
+	}
+	if (!threadStopped)
+	{
+		failure("Detached thread didn't stop\n");
+	}
+
+	// Test thread termination
+	threadStarted = false;
+	threadStopped = false;
+
+	thread = (HANDLE)_beginthreadex(nullptr, 0, LongThread, nullptr, 0, nullptr);
+	if (thread == 0)
+	{
+		failure("Long thread start error %d\n", errno);
+		return;
+	}
+	while (!threadStarted)
+	{
+		Sleep(1);
+	}
+	if (!TerminateThread(thread, 666))
+	{
+		failure("TerminateThread returned error %lu\n", GetLastError());
+	}
+	res = WaitForSingleObject(thread, 200);
+	if (res != WAIT_OBJECT_0)
+	{
+		failure("Waiting for terminated thread returned %lu instead of WAIT_OBJECT_0\n", res);
+	}
+	if (!GetExitCodeThread(thread, &res))
+	{
+		failure("GetExitCodeThread for terminated thread returned error %lu\n", GetLastError());
+	}
+	if (res != 666)
+	{
+		failure("Terminated thread exit code is %lu instead of 666\n", res);
+	}
+	if (!CloseHandle(thread))
+	{
+		failure("CloseHandle returned error %lu for terminated thread\n", GetLastError());
+		return;
+	}
+
+	// Test that signals don't abort wait with EINTR error
 	if (SetConsoleCtrlHandler(CtrlHandler, TRUE) == 0)
 	{
 		failure("Error setting user-side Ctrl-C handler. Error %lu\n", GetLastError());
@@ -44,15 +219,14 @@ void RunSyncTests()
 	if (event == 0)
 		failure("Event creation error %lu\n", GetLastError());
 
-	HANDLE thread = (HANDLE)_beginthreadex(nullptr, 0, Thread, nullptr, 0, nullptr);
+	thread = (HANDLE)_beginthreadex(nullptr, 0, Thread, nullptr, 0, nullptr);
 	if (thread == 0)
 	{
 		printf("Thread start error %d\n", errno);
 		return;
 	}
 
-	// Test that signals don't abort wait with EINTR error
-	DWORD res = WaitForSingleObject(event, 500);
+	res = WaitForSingleObject(event, 500);
 	if (!eventArrived)
 	{
 		failure("Expected console event hasn't arrived\n");
