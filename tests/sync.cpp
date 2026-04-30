@@ -56,6 +56,16 @@ unsigned WINAPI LongThread(void*)
 	return 3;
 }
 
+static volatile unsigned busyCounter = 0;
+unsigned WINAPI BusyThread(void*)
+{
+	threadStarted = true;
+	while (true || busyCounter < 1000000)
+		++busyCounter;
+	threadStopped = true;
+	return 4;
+}
+
 void RunSyncTests()
 {
 	// Test waiting for threads
@@ -126,7 +136,7 @@ void RunSyncTests()
 		failure("Short waiting for running thread returned %lu instead of WAIT_TIMEOUT\n", res);
 	}
 
-	res = WaitForSingleObject(thread, 200);
+	res = WaitForSingleObject(thread, 300);
 	if (res != WAIT_OBJECT_0)
 	{
 		failure("Longer waiting for running thread returned %lu instead of WAIT_OBJECT_0\n", res);
@@ -137,7 +147,7 @@ void RunSyncTests()
 	}
 	if (res != 2)
 	{
-		failure("Longer thread exit code is %lu instead of 2\n", res);
+		failure("Longer thread exit code is %lx instead of 2\n", res);
 	}
 	if (!CloseHandle(thread))
 	{
@@ -206,6 +216,49 @@ void RunSyncTests()
 	{
 		failure("CloseHandle returned error %lu for terminated thread\n", GetLastError());
 		return;
+	}
+
+	// Test that thread without cancellation points can be terminated
+	threadStarted = false;
+	threadStopped = false;
+
+	thread = (HANDLE)_beginthreadex(nullptr, 0, BusyThread, nullptr, 0, nullptr);
+	if (thread == 0)
+	{
+		failure("Busy thread start error %d\n", errno);
+		return;
+	}
+	while (!threadStarted)
+	{
+		Sleep(1);
+	}
+	if (!TerminateThread(thread, 666))
+	{
+		failure("TerminateThread returned error %lu for busy thread\n", GetLastError());
+	}
+	res = WaitForSingleObject(thread, 200);
+	if (res != WAIT_OBJECT_0)
+	{
+		failure("Waiting for terminated busy thread returned %lu instead of WAIT_OBJECT_0\n", res);
+	}
+	if (!GetExitCodeThread(thread, &res))
+	{
+		failure("GetExitCodeThread for terminated busy thread returned error %lu\n", GetLastError());
+	}
+	if (res != 666)
+	{
+		failure("Terminated busy thread exit code is %lu instead of 666\n", res);
+	}
+	if (!CloseHandle(thread))
+	{
+		failure("CloseHandle returned error %lu for busy terminated thread\n", GetLastError());
+		return;
+	}
+	unsigned oldCounter = busyCounter;
+	Sleep(10);
+	if (oldCounter != busyCounter)
+	{
+		failure("Busy thread hasn't been terminated\n");
 	}
 
 	// Test that signals don't abort wait with EINTR error

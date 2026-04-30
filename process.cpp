@@ -3,18 +3,21 @@
 #include <pthread.h>
 #include <sys/eventfd.h>
 #include <sys/syscall.h>
+#include <stdio.h>
 #include <unistd.h>
+#include <atomic>
 
 #include "windows.h"
 #include "handleapi.h"
 #include "process.h"
+#include "mutex_holder.h"
 
 struct ThreadHandle: public handle_t
 {
     pthread_t handle;
     ThreadFunc* addr;
     void* args;
-    DWORD ExitCode = STILL_ACTIVE;
+    volatile DWORD ExitCode = STILL_ACTIVE;
     // Handle that allows to wait for thread's finish.
     // pthread_t cannot be used for that because
     //  a) it is not fd and cannot be used in select/poll
@@ -27,14 +30,50 @@ struct ThreadHandle: public handle_t
     // detach of thread. It cannot be done on UsageCounter == 1 because
     // a) You cannot tell if other usage is thread itself or a duplicated handle;
     // b) while you are checking and going to detach thread someone else can drop counter to zero and free this handle.
-    struct is
-    {
-        static const int detached = 1;
-        static const int finished = 2;
-    };
-    std::atomic_int flags;
+    //
+    // But inplementation with flags had different problem: the structure can be destructed while
+    // parallel thread using it:
+    // Thread 1 started thread 2 and wait for its finish.
+    // Thread 3 performing cleanup and calls TerminateThread for thread 2.
+    // (This is a bad idea in general but there is no other way to kill thread 2 while thread 1 is waiting.)
+    // In exactly the same moment thread 2 is finished (either itself or by pthread_cancel) and get signalled
+    // so thread 1 happily finish waiting and close the handle.
+    // But due to CPU starvation thread 3 is still in TerminateThread and use the structure!!!
+    //
+    // So let's get back to reference counter and make every routine manipulating thread to keep own reference
+    // including thread routine itself.
+    // Fortunatelly pthread_cancel is implemented by abi::__forced_unwind exception and RAII holders work.
+    std::atomic_int refCounter;
 
-    ThreadHandle(): flags(0)
+    struct Holder
+    {
+        ThreadHandle* h;
+        Holder(ThreadHandle* thread) : h(thread)
+        {
+            // Safety first!
+            if (h != nullptr && h->type == handle_type::HANDLE_THREAD)
+                ++h->refCounter;
+        }
+        ~Holder()
+        {
+            // Yes, it is safe to delete nullptr, but modification of member after delete is hard to detect.
+            if (h != nullptr && h->type == handle_type::HANDLE_THREAD)
+            {
+                if (--h->refCounter == 0)
+                {
+                    delete h;
+                    h = nullptr;
+                }
+            }
+        }
+        ThreadHandle* operator->()
+        {
+            return h;
+        }
+    };
+
+    // This structure owns itself so refCounter starts from 1.
+    ThreadHandle(): refCounter(1)
     {
         type = handle_type::HANDLE_THREAD;
     };
@@ -54,17 +93,12 @@ ThreadHandle::~ThreadHandle()
 
 void ThreadHandle::release()
 {
-    if ((flags & is::detached) == 0)
-    {
-        // This call can fail if thread already finished, so ignore returning value
-        pthread_detach(handle);
-    }
-    // Setting of "detached" flag if it is already set is safe and we _must_ perform it in any case.
-    if ((flags.fetch_or(is::detached) & is::finished) != 0)
+    // This routine is called from CloseHandle.
+    // Release self-ownership
+    if (--refCounter == 0)
     {
         delete this;
     }
-    // No code below this point because this handle can be being deleted by thread routine.
 }
 
 int ThreadHandle::GetWaitableHandle()
@@ -73,11 +107,10 @@ int ThreadHandle::GetWaitableHandle()
     if (waitHandle == -1)
     {
         // Following code is protected by mutex in case that thread is about finish right now
-        pthread_mutex_lock(&ExitCodeGuard);
-        int state = (ExitCode == STILL_ACTIVE)? 0 : 1;
-        // Protected section includes mutex creation for simplification
+        MutexHolder guard(&ExitCodeGuard);
+
+        int state = (ExitCode == STILL_ACTIVE) ? 0 : 1;
         waitHandle = eventfd(state, EFD_CLOEXEC | EFD_NONBLOCK);
-        pthread_mutex_unlock(&ExitCodeGuard);
     }
     return waitHandle;
 }
@@ -89,50 +122,54 @@ WINBOOL GetExitCodeThread(HANDLE hThread, LPDWORD lpExitCode)
         errno = ERROR_INVALID_HANDLE;
         return FALSE;
     }
-    ThreadHandle* h = static_cast<ThreadHandle*>(hThread);
-    if ((h->flags & ThreadHandle::is::finished) != 0)
+    if (lpExitCode == nullptr)
     {
-        // Bug protection.
-        if (h->ExitCode == STILL_ACTIVE) // Bad value, may cause endless loop by MSDN version.
-        {
-            h->ExitCode = 0xBAD;
-        }
+        errno = ERROR_INVALID_PARAMETER;
+        return FALSE;
+    }
+
+    ThreadHandle::Holder h(static_cast<ThreadHandle*>(hThread));
+
+    // No waitting inside so keeping lock is safe here
+    MutexHolder guarg(&h->ExitCodeGuard);
+    if (h->ExitCode != STILL_ACTIVE)
+    {
         *lpExitCode = h->ExitCode;
         return TRUE;
     }
-    // Even if out code always set "finished" flag on thread end or termination,
-    // thread can be killed by someone else, so we must check if it really alive.
+
+    // ExitCode STILL_ALIVE doesn't mean that the thread is really alive.
+    // Let's check it.
     void* result;
     switch ((errno = pthread_tryjoin_np(h->handle, &result)))
     {
     case EBUSY:
-        // ExitCode must not be assigned here because of thread race
         *lpExitCode = STILL_ACTIVE;
         return TRUE;
+
     case 0:
-        // At this point we are sure that thread is dead and won't interfere us, so we can work w/o synchronization.
         // Join is a destructive operation, any attempt to join or detach this thread afterward
-        // is UB, mark it as both finished and detached, but do not release handle till CloseHandle().
-        h->flags |= ThreadHandle::is::finished | ThreadHandle::is::detached;
-        if (h->ExitCode == STILL_ACTIVE)
+        // is UB, so we HAVE TO set exit code to something other than STILL_ALIVE to prevent
+        // joining from any other place.
+
+        if (h->ExitCode == STILL_ACTIVE) // That's a lie!!!
         {
                 DWORD NewExitCode = (uintptr_t)(result) & 0xFFFFFFFF;
-                if (NewExitCode == STILL_ACTIVE)
+                if (NewExitCode == STILL_ACTIVE) // Still possible on 32 bits.
                 {
                     NewExitCode = 0xBAD;
                 }
-                // If this code is executed in parallel with TerminateThread(), exit code may get
-                // value PTHREAD_CANCELLED instead of what it is supposed to.
-                // Let's ignore this case.
                 h->ExitCode = NewExitCode;
         }
         // else the thread managed to set exit code and we must not change it.
         *lpExitCode = h->ExitCode;
+
         // Just in case that thread failed to signal its finish
         if (h->waitHandle != -1)
         {
             eventfd_write(h->waitHandle, 1);
         }
+
         return TRUE;
     }
     return FALSE;
@@ -145,36 +182,47 @@ WINBOOL TerminateThread(HANDLE hThread, DWORD dwExitCode)
         errno = ERROR_INVALID_HANDLE;
         return FALSE;
     }
-    ThreadHandle* h = static_cast<ThreadHandle*>(hThread);
-    if (h->flags != 0) // This thread is already finished or detached. We cannot cancel detached thread
+    if (dwExitCode == STILL_ACTIVE)
+    {
+        // Bad exit code, replace it with something else
+        dwExitCode = 0xBAD;
+    }
+
+    ThreadHandle::Holder h(static_cast<ThreadHandle*>(hThread));
+    if (h->ExitCode != STILL_ACTIVE) // This thread is already finished or detached.
     {
         // Consider it as a success
-        h->ExitCode = dwExitCode;
         return TRUE;
     }
     if ((errno = pthread_cancel(h->handle)) == 0)
     {
-        // Cancellation signal has been sent but thread may still heading to cancellation point.
-        // It makes a problem: if we mark thread as finished and return following CloseHandle() will
-        // destroy this handle, but thread may be still active and by chance it is in finalization
-        // stage, accessing struct members.
-        // If we don't mark it as finished, CloseHandle() won't destroy handle but thread will never
-        // reach finalization code, so we'll have memory leak.
-        // To solve that join it right here.
-        // It may hang in which case timeouted join or asynchronous cancel can be used
-        // but so far let's trust our own threads.
-        void* result;
-        // Result of this call is irrelevant, most of errors means that the thread is already dead
-        // (except, may be EINTR)
-        if (pthread_join(h->handle, &result) == 0)
-        {
-            // Join succeeded, prevent it from repeating
-            h->flags |= ThreadHandle::is::detached;
+        // Cancellation signal has been sent but even asynchronous cancellation doesn't guarantee immediate stop.
+        bool mustWait = false;
+        DWORD oldExitCode = STILL_ACTIVE;
+        { // Scope
+            // We cannot wait inside of lock and if we leave ExitCode STILL_ALIVE, someone can join inbetween.
+            MutexHolder guard(&h->ExitCodeGuard);
+            oldExitCode = h->ExitCode;
+            if (h->ExitCode == STILL_ACTIVE)
+            {
+                h->ExitCode = dwExitCode;
+                mustWait = true;
+            }
         }
-        // Flag the thread as finished because it hardly can do it itself now.
-        h->flags |= ThreadHandle::is::finished;
-        // Don't use ExitCodeGuard here because it may be held by killed thread which will cause deadlock.
-        h->ExitCode = dwExitCode;
+        if (mustWait)
+        {
+            void* result = PTHREAD_CANCELED;
+            timespec t{time(nullptr) + 1, 0};
+            if ((errno = pthread_timedjoin_np(h->handle, &result, &t)) != 0)
+            {
+                return FALSE;
+            }
+            // If thread wasn't really cancelled and returned a valid exit code
+            if (result != PTHREAD_CANCELED)
+            {
+                h->ExitCode = oldExitCode;
+            }
+        }
         if (h->waitHandle != -1)
         {
             eventfd_write(h->waitHandle, 1);
@@ -183,13 +231,16 @@ WINBOOL TerminateThread(HANDLE hThread, DWORD dwExitCode)
     }
     if (errno == ESRCH) // No such thread, consider it as a success as well
     {
-        h->flags |= ThreadHandle::is::finished | ThreadHandle::is::detached;
-        h->ExitCode = dwExitCode;
+        // Also success but the thread died first.
+        MutexHolder guard(&h->ExitCodeGuard);
+        if (h->ExitCode == STILL_ACTIVE)
+        {
+            h->ExitCode = dwExitCode;
+        }
         if (h->waitHandle != -1)
         {
             eventfd_write(h->waitHandle, 1);
         }
-        return TRUE;
     }
     return FALSE;
 }
@@ -197,25 +248,43 @@ WINBOOL TerminateThread(HANDLE hThread, DWORD dwExitCode)
 // this function is an adapter between different thread function declarations in Windows and POSIX
 static void* thread_impl(void* param)
 {
-    ThreadHandle* h = static_cast <ThreadHandle*>(param);
-    h->id = GetCurrentThreadId();
-    // Execute user code
-    unsigned result = h->addr(h->args);
-    // Following piece must be synchronized with GetWaitableHandle()
-    pthread_mutex_lock(&(h->ExitCodeGuard));
-    h->ExitCode = result;
-    if (h->waitHandle != -1)
+    ThreadHandle::Holder h(static_cast <ThreadHandle*>(param));
+
+    try
     {
-        eventfd_write(h->waitHandle, 1);
+        // Do it ASAP to let _beginthreadex return right tid
+        h->id = GetCurrentThreadId();
+
+        // Allow TerminateThread to be dangerous and kill even busy threads without cancellation points inside.
+        int oldType;
+        pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &oldType);
+
+        // Execute user code
+        unsigned result = h->addr(h->args);
+
+        MutexHolder guard(&(h->ExitCodeGuard));
+
+        h->ExitCode = result;
+        if (h->waitHandle != -1)
+        {
+            eventfd_write(h->waitHandle, 1);
+        }
+        // That's all, folks
+        return reinterpret_cast<void*>(result);
     }
-    pthread_mutex_unlock(&(h->ExitCodeGuard));
-    // That's all, folks
-    if ((h->flags.fetch_or(ThreadHandle::is::finished) & ThreadHandle::is::detached) != 0)
+    catch (...) // Most likely it is abi::__forced_unwind. Or a but in user code that let exception fly away
     {
-        delete h;
+        MutexHolder guard(&(h->ExitCodeGuard));
+        if (h->ExitCode == STILL_ACTIVE)
+        {
+            h->ExitCode = (DWORD)PTHREAD_CANCELED;
+        }
+        if (h->waitHandle != -1)
+        {
+            eventfd_write(h->waitHandle, 1);
+        }
+        throw;
     }
-    // No code here is allowed to access h even if it wasn't deleted by line above.
-    return reinterpret_cast<void*>(result);
 }
 
 HANDLE _beginthreadex(void*, unsigned stack_size, ThreadFunc* start_address, void* arglist, unsigned, unsigned* tid)
@@ -255,6 +324,43 @@ HANDLE _beginthreadex(void*, unsigned stack_size, ThreadFunc* start_address, voi
         int attempts = 0;
         while (result->id == -1 && ++attempts < 100) // I hope 100 is enough
         {
+            // Despite recommendations, sleep(0) is the best way for busy wait.
+            // sched_yield() would require to raise number attempts to several thousands.
+            // Following test programs shows 1-2 for sleep(0), 20-2000 for sched_yeld()
+            // and 1000-10000 for nothing.
+            //volatile int i = 0;
+            //
+            //void* thread_func(void*)
+            //{
+            //	i = 1;
+            //	return nullptr;
+            //}
+            //
+            //
+            //int main()
+            //{
+            //	while (true)
+            //	{
+            //		int n = 0;
+            //		i = 0;
+            //		pthread_t thread;
+            //		pthread_create(&thread, nullptr, thread_func, nullptr);
+            //		while (i == 0)
+            //		{
+            //			//sleep(0);
+            //          //sched_yield();
+            //			++n;
+            //		}
+            //		printf("Thread started %d\n", n);
+            //		if (int err = pthread_join(thread, nullptr))
+            //		{
+            //			printf("join error %d\n", err);
+            //		}
+            //		sleep(1);
+            //	}
+            //}
+
+            // On the other hand condition variable could be used here, perhaps...
             sleep(0);
         }
         *tid = result->id;

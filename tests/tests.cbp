@@ -103,6 +103,9 @@
 		<Unit filename="../mbstowcs_l.cpp">
 			<Option target="Linux" />
 		</Unit>
+		<Unit filename="../mutex_holder.h">
+			<Option target="Linux" />
+		</Unit>
 		<Unit filename="../nmmintrin.h">
 			<Option target="Linux" />
 		</Unit>
