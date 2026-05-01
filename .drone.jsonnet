@@ -23,7 +23,7 @@
       commands:
       [
         "dir env:",
-        "& dir c:/apps",
+        "& dir c:/",
       ],
     },
   ]

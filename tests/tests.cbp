@@ -166,6 +166,9 @@
 		<Unit filename="../stdlib.h">
 			<Option target="Linux" />
 		</Unit>
+		<Unit filename="../synchapi.h">
+			<Option target="Linux" />
+		</Unit>
 		<Unit filename="../synchron.cpp">
 			<Option target="Linux" />
 		</Unit>

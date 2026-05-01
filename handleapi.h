@@ -4,7 +4,8 @@
 #include <atomic>
 #include "winnt.h"
 
-constexpr HANDLE INVALID_HANDLE_VALUE = nullptr;
+// It is better to be a macro because some "other code" checks if it is defined
+#define INVALID_HANDLE_VALUE (nullptr)
 
 struct handle_t
 {

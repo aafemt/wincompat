@@ -8,6 +8,7 @@
 #include "handleapi.h"
 #include "processthreadsapi.h"
 #include "securitybaseapi.h"
+#include "synchapi.h"
 
 #define FILE_BEGIN      0   // SEEK_SET
 #define FILE_CURRENT    1   // SEEK_CUR
