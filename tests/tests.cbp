@@ -166,6 +166,12 @@
 		<Unit filename="../stdlib.h">
 			<Option target="Linux" />
 		</Unit>
+		<Unit filename="../string.cpp">
+			<Option target="Linux" />
+		</Unit>
+		<Unit filename="../string.h">
+			<Option target="Linux" />
+		</Unit>
 		<Unit filename="../synchapi.h">
 			<Option target="Linux" />
 		</Unit>
@@ -217,6 +223,7 @@
 		<Unit filename="nls.cpp" />
 		<Unit filename="nls.h" />
 		<Unit filename="path.cpp" />
+		<Unit filename="str.cpp" />
 		<Unit filename="sync.cpp" />
 		<Extensions />
 	</Project>

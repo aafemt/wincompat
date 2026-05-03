@@ -15,11 +15,13 @@ void RunEnvTests();
 void RunPathTests();
 void RunSyncTests();
 void RunDllTests();
+void RunStringTests();
 
 int main()
 {
 	setlocale(LC_ALL, "");
 
+	RunStringTests();
 	RunEnvTests();
 	RunFindTests();
 	RunNlsTests();
