@@ -12,7 +12,7 @@
   [
     {
       name: "show environment",
-      image: "dctl-registry.dcinet:5000/windows-servercore-1809/vs2022",
+      image: "dctl-registry.dcinet:5000/windows-servercore-1809/mingw-gcc81c-vs2010",
       environment:
 	  {   DCTL_BASE_URL: { from_secret: "gitea_server" },
           DCTL_FB_API_KEY: { from_secret: "fb_api_token" },

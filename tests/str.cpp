@@ -41,9 +41,9 @@ void RunStringTests()
 	{
 		failure("strcat_s set errno to %d instead of EINVAL on not terminated destination\n", res);
 	}
-	if (strcmp(buffer, "StartEnd") != 0)
+	if (buffer[0] != '\0')
 	{
-		failure("strcat_s modified buffer to %s on not terminated destination\n", buffer);
+		failure("strcat_s dodn't set not terminated destination to empty string\n");
 	}
 	errno = 0;
 	res = strcat_s(buffer, sizeof(buffer), nullptr);
@@ -62,17 +62,17 @@ void RunStringTests()
 	errno = 0;
 	buffer[0] = 'S';
 	res = strcat_s(buffer, 0, "End");
-	if (res != ERANGE)
+	if (res != EINVAL)
 	{
-		failure("strcat_s returned %d instead of ERANGE on zero destination\n", res);
+		failure("strcat_s returned %d instead of EINVAL on zero destination\n", res);
 	}
-	if (errno != ERANGE)
+	if (errno != EINVAL)
 	{
-		failure("strcat_s set errno to %d instead of ERANGE on zero destination\n", res);
+		failure("strcat_s set errno to %d instead of EINVAL on zero destination\n", res);
 	}
-	if (buffer[0] != '\0')
+	if (buffer[0] == '\0')
 	{
-		failure("strcat_s didn't set destination to empty string on zero destination\n");
+		failure("strcat_s set destination to empty string on zero destination\n");
 	}
 	// Test priority of errors
 	errno = 0;
@@ -86,9 +86,25 @@ void RunStringTests()
 	{
 		failure("strcat_s set errno to %d instead of EINVAL on zero destination and null source\n", res);
 	}
+	if (buffer[0] == '\0')
+	{
+		failure("strcat_s set destination to empty string on zero destination and null source\n");
+	}
+
+	errno = 0;
+	strcpy(buffer, "Start");
+	res = strcat_s(buffer, 3, nullptr);
+	if (res != EINVAL)
+	{
+		failure("strcat_s returned %d instead of EINVAL on unterminated destination and null source\n", res);
+	}
+	if (errno != EINVAL)
+	{
+		failure("strcat_s set errno to %d instead of EINVAL on unterminated destination and null source\n", res);
+	}
 	if (buffer[0] != '\0')
 	{
-		failure("strcat_s didn't set destination to empty string on zero destination and null source\n");
+		failure("strcat_s didn't set destination to empty string on unterminated destination and null source\n");
 	}
 
 	errno = 0;
