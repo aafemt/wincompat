@@ -66,6 +66,23 @@ unsigned WINAPI BusyThread(void*)
 	return 4;
 }
 
+CRITICAL_SECTION cs;
+volatile bool stopIt = false;
+unsigned WINAPI BusyCriticalThread(void*)
+{
+	threadStarted = true;
+	while (!stopIt)
+	{
+		EnterCriticalSection(&cs);
+		++busyCounter;
+		Sleep(0);
+		++busyCounter;
+		LeaveCriticalSection(&cs);
+	}
+	threadStopped = true;
+	return 5;
+}
+
 void RunSyncTests()
 {
 	// Test waiting for threads
@@ -259,6 +276,46 @@ void RunSyncTests()
 	if (oldCounter != busyCounter)
 	{
 		failure("Busy thread hasn't been terminated\n");
+	}
+
+	// Test critical sections
+	busyCounter = 0;
+	threadStarted = false;
+	threadStopped = false;
+	InitializeCriticalSection(&cs);
+
+	thread = (HANDLE)_beginthreadex(nullptr, 0, BusyCriticalThread, nullptr, 0, nullptr);
+	if (thread == 0)
+	{
+		failure("Busy critical thread start error %d\n", errno);
+		return;
+	}
+	while (!threadStarted)
+	{
+		Sleep(1);
+	}
+	EnterCriticalSection(&cs);
+	oldCounter = busyCounter;
+	Sleep(100);
+	if (oldCounter != busyCounter)
+	{
+		failure("Background thread didn't stop in critical section\n");
+	}
+	stopIt = true;
+	LeaveCriticalSection(&cs);
+	res = WaitForSingleObject(thread, 100);
+	if (res != WAIT_OBJECT_0)
+	{
+		failure("Waiting for critically busy thread returned %lu instead of WAIT_OBJECT_0\n", res);
+	}
+	if (!CloseHandle(thread))
+	{
+		failure("CloseHandle returned error %lu for critically busy thread\n", GetLastError());
+		return;
+	}
+	if (busyCounter == oldCounter || busyCounter == 0)
+	{
+		failure("Bacckground thread didn't continue after leaving critical section");
 	}
 
 	// Test that signals don't abort wait with EINTR error
