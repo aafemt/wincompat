@@ -178,6 +178,9 @@
 		<Unit filename="../synchron.cpp">
 			<Option target="Linux" />
 		</Unit>
+		<Unit filename="../wcwmain.cpp">
+			<Option target="Linux" />
+		</Unit>
 		<Unit filename="../winbase.h">
 			<Option target="Linux" />
 		</Unit>

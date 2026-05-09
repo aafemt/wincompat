@@ -6,8 +6,11 @@
 
 #include <errno.h>
 #include <string.h>
+#include <memory>
 
 #include "globals.h"
+
+void paramsToUnicode(char* params[], std::unique_ptr<wchar_t*[]>& pointers, std::unique_ptr<wchar_t[]>& data);
 
 void RunStringTests()
 {
@@ -123,4 +126,22 @@ void RunStringTests()
 		failure("strcat_s didn't set destination to empty string on insufficient destination\n");
 	}
 
-}
+	char abc[] = "abc";
+	char def[] = "def";
+	char* ptrs[] = {abc, def, nullptr};
+	std::unique_ptr<wchar_t[]> data;
+	std::unique_ptr<wchar_t*[]> pointers;
+	paramsToUnicode(ptrs, pointers, data);
+	if (wcscmp(pointers[0], L"abc") != 0)
+	{
+		failure("Parameter 0 is %S instead of %s\n", pointers[0], ptrs[0]);
+	}
+	if (wcscmp(pointers[1], L"def") != 0)
+	{
+		failure("Parameter 1 is %S instead of %s\n", pointers[1], ptrs[1]);
+	}
+	if (pointers[2] != nullptr)
+	{
+		failure("Parameter 2 is %S instead of nullptr\n", pointers[2]);
+	}
+	}
