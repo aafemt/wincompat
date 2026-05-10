@@ -159,6 +159,7 @@ constexpr const WCHAR* const expectedNames[] =
 	L"tests",
 	L"testdll.so",
 	L"testdll.dll",
+	L"libpathcch.a",
 	L"obj",
 	L"existentpath"
 };

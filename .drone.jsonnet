@@ -11,7 +11,7 @@
   steps:
   [
     {
-      name: "Windows",
+      name: "Build and test",
       image: "dctl-registry.dcinet:5000/windows-servercore-1809/mingw-gcc81c-vs2010",
       environment:
 	  {   DCTL_BASE_URL: { from_secret: "gitea_server" },
