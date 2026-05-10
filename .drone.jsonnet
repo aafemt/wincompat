@@ -11,7 +11,7 @@
   steps:
   [
     {
-      name: "show environment",
+      name: "Windows",
       image: "dctl-registry.dcinet:5000/windows-servercore-1809/mingw-gcc81c-vs2010",
       environment:
 	  {   DCTL_BASE_URL: { from_secret: "gitea_server" },
@@ -30,7 +30,7 @@
         "mingw32-make -f testdll.cbp.mak windows",
         "mingw32-make -f tests.cbp.mak windows",
 		"cd build",
-		"tests",
+		"& ./tests",
       ],
     },
   ]
