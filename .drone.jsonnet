@@ -31,7 +31,7 @@
         "mingw32-make -f testdll.cbp.mak windows",
         "mingw32-make -f tests.cbp.mak windows",
 		"cd build",
-		"./tests",
+		"& ./tests",
         "echo $LastExitCode"
       ],
     },
