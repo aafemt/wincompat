@@ -126,6 +126,7 @@ void RunStringTests()
 		failure("strcat_s didn't set destination to empty string on insufficient destination\n");
 	}
 
+#ifndef __WIN32__
 	char abc[] = "abc";
 	char def[] = "def";
 	char* ptrs[] = {abc, def, nullptr};
@@ -144,4 +145,5 @@ void RunStringTests()
 	{
 		failure("Parameter 2 is %S instead of nullptr\n", pointers[2]);
 	}
-	}
+#endif
+}
