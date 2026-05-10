@@ -9,6 +9,7 @@
 
 #include "globals.h"
 
+#ifndef __WIN32__
 volatile bool eventArrived = false;
 
 static BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
@@ -31,6 +32,7 @@ unsigned WINAPI Thread(void*)
 		failure("GenerateConsoleCtrlEvent error %lu\n", GetLastError());
 	return 0;
 }
+#endif
 
 volatile bool threadStarted = false;
 volatile bool threadStopped = false;
