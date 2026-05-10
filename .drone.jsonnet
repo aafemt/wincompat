@@ -6,7 +6,7 @@
     arch: "amd64",
     version: "1809"
   },
-  clone: { disable: true },
+  clone: { disable: false },
   trigger: { event: [ "push", "custom" ] },
   steps:
   [
