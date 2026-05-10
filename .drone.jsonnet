@@ -22,13 +22,14 @@
       },
       commands:
       [
-        "cd tests"
+        "cd tests",
+        "dlltool -d pathcch.def -D api-ms-win-core-path-l1-1-0.dll -l build/libpathcch.a",
         "c:/apps/cbp2make.exe -in testdll.cbp",
         "c:/apps/cbp2make.exe -in tests.cbp",
         "mingw32-make -f testdll.cbp.mak windows",
         "mingw32-make -f tests.cbp.mak windows",
 		"cd builds",
-		"tests"
+		"tests",
       ],
     },
   ]

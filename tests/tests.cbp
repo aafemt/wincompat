@@ -19,6 +19,7 @@
 					<Add option="-mthreads" />
 					<Add library="shlwapi" />
 					<Add library="pathcch" />
+					<Add directory="build" />
 				</Linker>
 			</Target>
 			<Target title="Linux">

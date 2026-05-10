@@ -1,0 +1,21 @@
+; dlltool -z pathcch.def -D KernelBase.dll
+EXPORTS
+PathCchAddBackslash
+PathCchAddBackslashEx
+PathCchAddExtension
+PathCchAppend
+PathCchAppendEx
+PathCchCanonicalize
+PathCchCanonicalizeEx
+PathCchCombine
+PathCchCombineEx
+PathCchFindExtension
+PathCchIsRoot
+PathCchRemoveBackslash
+PathCchRemoveBackslashEx
+PathCchRemoveExtension
+PathCchRemoveFileSpec
+PathCchRenameExtension
+PathCchSkipRoot
+PathCchStripPrefix
+PathCchStripToRoot
