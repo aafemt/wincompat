@@ -22,6 +22,7 @@
       },
       commands:
       [
+        "Set-PSDebug -Trace 1",
         "cd tests",
         "mkdir build",
         "dlltool -d pathcch.def -D api-ms-win-core-path-l1-1-0.dll -l build/libpathcch.a",
@@ -30,7 +31,7 @@
         "mingw32-make -f testdll.cbp.mak windows",
         "mingw32-make -f tests.cbp.mak windows",
 		"cd build",
-		"& ./tests",
+		"./tests"
       ],
     },
   ]
