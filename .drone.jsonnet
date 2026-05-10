@@ -22,8 +22,13 @@
       },
       commands:
       [
-        "dir env:",
-        "& dir c:/apps",
+        "cd tests"
+        "c:/apps/cbp2make.exe -in testdll.cbp",
+        "c:/apps/cbp2make.exe -in tests.cbp",
+        "mingw32-make -f testdll.cbp.mak windows",
+        "mingw32-make -f tests.cbp.mak windows",
+		"cd builds",
+		"tests"
       ],
     },
   ]
