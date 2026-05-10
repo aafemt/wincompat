@@ -22,7 +22,6 @@
       },
       commands:
       [
-        "Set-PSDebug -Trace 1",
         "cd tests",
         "mkdir build",
         "dlltool -d pathcch.def -D KernelBase.dll -l build/libpathcch.a",

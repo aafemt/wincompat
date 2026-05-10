@@ -27,7 +27,7 @@ int main()
 	RunNlsTests();
 	RunPathTests();
 //	RunSyncTests();
-//	RunDllTests();
+	RunDllTests();
 
 	if (failed)
 	{
