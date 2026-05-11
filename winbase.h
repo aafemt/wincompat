@@ -22,6 +22,11 @@ struct FILE_END_OF_FILE_INFO
     LARGE_INTEGER EndOfFile;
 };
 
+struct FILE_DISPOSITION_INFO
+{
+	BOOL DeleteFile;
+};
+
 struct OVERLAPPED
 {
 //    struct

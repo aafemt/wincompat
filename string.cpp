@@ -1,6 +1,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <string.h>
+#include <wchar.h>
 
 int strcat_s(char* strDestination, size_t numberOfElements, const char* strSource)
 {
@@ -33,4 +34,9 @@ int strcat_s(char* strDestination, size_t numberOfElements, const char* strSourc
 	}
 	strcpy(eos, strSource);
 	return 0;
+}
+
+int _wcsnicmp(const wchar_t* string1, const wchar_t* string2, size_t count)
+{
+	return wcsncasecmp(string1, string2, count);
 }

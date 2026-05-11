@@ -39,8 +39,9 @@ struct FileHandle: public handle_t
 {
     ~FileHandle();
 public:
-    int handle = -1;
+    std::string fileName;   // Preserve name for further usage with unlink if necessary
     std::string lockFileName;
+    int handle = -1;
     int lockFile = -1;
 
     FileHandle(int h): handle(h) { type = handle_type::HANDLE_FILE; }
@@ -561,6 +562,7 @@ HANDLE CreateFile(const char* lpFileName, DWORD dwDesiredAccess, DWORD dwShareMo
                 flock(result->handle, LOCK_UN);
         }
 
+        result->fileName = lpFileName;
         // TODO: Move unlink to close from this temporary stub
         if (dwFlagsAndAtrributes & FILE_FLAG_DELETE_ON_CLOSE)
         {
@@ -817,12 +819,30 @@ WINBOOL SetFileInformationByHandle(HANDLE hFile, FILE_INFO_BY_HANDLE_CLASS FileI
             if (dwBufferSize != sizeof(FILE_END_OF_FILE_INFO))
             {
                 errno = ERROR_BAD_LENGTH;
-                return false;
+                return FALSE;
             }
             FILE_END_OF_FILE_INFO* info = reinterpret_cast<FILE_END_OF_FILE_INFO*>(lpFileInformation);
 
-            return ftruncate64(handle->handle, info->EndOfFile.QuadPart) == 0?TRUE:FALSE;
+            return ftruncate64(handle->handle, info->EndOfFile.QuadPart) == 0 ? TRUE : FALSE;
 
+            break;
+        }
+    case FileDispositionInfo:
+        {
+            if (dwBufferSize != sizeof(FILE_DISPOSITION_INFO))
+            {
+                errno = ERROR_BAD_LENGTH;
+                return FALSE;
+            }
+            FILE_DISPOSITION_INFO* info = reinterpret_cast<FILE_DISPOSITION_INFO*>(lpFileInformation);
+
+            // I'm not sure if this call on Windows delete file immediatelly or only on close.
+            // Let's do it now!
+            if (info->DeleteFile)
+            {
+                return unlink(handle->fileName.c_str()) == 0 ? TRUE : FALSE;
+            }
+            // else what, link it back? Theoretically possible as we have preserved file name.
             break;
         }
     default:

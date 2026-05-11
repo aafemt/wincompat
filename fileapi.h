@@ -8,6 +8,7 @@
 // Very incomplete
 enum FILE_INFO_BY_HANDLE_CLASS
 {
+	FileDispositionInfo = 4,
     FileEndOfFileInfo = 6,
     MaximumFileInfoByHandleClass
 };
