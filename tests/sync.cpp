@@ -9,7 +9,6 @@
 
 #include "globals.h"
 
-#ifndef __WIN32__
 volatile bool eventArrived = false;
 
 static BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
@@ -32,7 +31,6 @@ unsigned WINAPI Thread(void*)
 		failure("GenerateConsoleCtrlEvent error %lu\n", GetLastError());
 	return 0;
 }
-#endif
 
 volatile bool threadStarted = false;
 volatile bool threadStopped = false;
@@ -320,9 +318,17 @@ void RunSyncTests()
 		failure("Bacckground thread didn't continue after leaving critical section");
 	}
 
-#ifndef __WIN32__
 	// Test that signals don't abort wait with EINTR error.
+#ifdef __WIN32__
 	// This test is too harsh for Drone CI and thus is disabled on windows
+	// And, actually, this area is buggy in common: https://github.com/microsoft/terminal/issues/335
+	const char* drone = getenv("DRONE");
+	if (drone != nullptr && strcmp(drone, "true") == 0)
+	{
+		printf("Console handler test skipped\n");
+		return;
+	}
+#endif
 	if (SetConsoleCtrlHandler(CtrlHandler, TRUE) == 0)
 	{
 		failure("Error setting user-side Ctrl-C handler. Error %lu\n", GetLastError());
@@ -373,5 +379,4 @@ void RunSyncTests()
 			failure("Error unsetting non-user Ctrl-C handler. Error %lu instead of ERROR_INVALID_PARAMETER\n", err);
 		}
 	}
-#endif
 }
