@@ -96,20 +96,22 @@ void RunNlsTests()
 	if (res == 0)
 	{
 		failure("Zero-terminated WideCharToMultiByte returned error %ld\n", GetLastError());
-		return;
 	}
-	if (res != 5)
+	else
 	{
-		failure("Zero-terminated WideCharToMultiByte returned %d instead of 5\n", res);
-	}
-	if (buffer[0] != 0xd0 || buffer[1] != 0xb0 ||
-		buffer[2] != 0xd0 || buffer[3] != 0xb1 ||
-		buffer[4] != 0x00 || buffer[5] != 0x11
-		)
-	{
-		failure("Zero-terminated WideCharToMultiByte result is %x%x%x%x%x%x instead of d0b0d0b10011\n",
-				(unsigned char)buffer[0], (unsigned char)buffer[1], (unsigned char)buffer[2],
-				(unsigned char)buffer[3], (unsigned char)buffer[4], (unsigned char)buffer[5])
+		if (res != 5)
+		{
+			failure("Zero-terminated WideCharToMultiByte returned %d instead of 5\n", res);
+		}
+		if (buffer[0] != 0xd0 || buffer[1] != 0xb0 ||
+			buffer[2] != 0xd0 || buffer[3] != 0xb1 ||
+			buffer[4] != 0x00 || buffer[5] != 0x11
+			)
+		{
+			failure("Zero-terminated WideCharToMultiByte result is %x%x%x%x%x%x instead of d0b0d0b10011\n",
+					(unsigned char)buffer[0], (unsigned char)buffer[1], (unsigned char)buffer[2],
+					(unsigned char)buffer[3], (unsigned char)buffer[4], (unsigned char)buffer[5]);
+		}
 	}
 
 	// The same for limited
@@ -118,20 +120,22 @@ void RunNlsTests()
 	if (res == 0)
 	{
 		failure("Limited WideCharToMultiByte returned error %ld\n", GetLastError());
-		return;
 	}
-	if (res != 4)
+	else
 	{
-		failure("Limited WideCharToMultiByte returned %d instead of 4\n", res);
-	}
-	if (buffer[0] != 0xd0 || buffer[1] != 0xb0 ||
-		buffer[2] != 0xd0 || buffer[3] != 0xb1 ||
-		buffer[4] != 0x11 || buffer[5] != 0x11
-		)
-	{
-		failure("Limited WideCharToMultiByte result is %x%x%x%x%x%x instead of d0b0d0b11111\n",
-				(unsigned char)buffer[0], (unsigned char)buffer[1], (unsigned char)buffer[2],
-				(unsigned char)buffer[3], (unsigned char)buffer[4], (unsigned char)buffer[5])
+		if (res != 4)
+		{
+			failure("Limited WideCharToMultiByte returned %d instead of 4\n", res);
+		}
+		if (buffer[0] != 0xd0 || buffer[1] != 0xb0 ||
+			buffer[2] != 0xd0 || buffer[3] != 0xb1 ||
+			buffer[4] != 0x11 || buffer[5] != 0x11
+			)
+		{
+			failure("Limited WideCharToMultiByte result is %x%x%x%x%x%x instead of d0b0d0b11111\n",
+					(unsigned char)buffer[0], (unsigned char)buffer[1], (unsigned char)buffer[2],
+					(unsigned char)buffer[3], (unsigned char)buffer[4], (unsigned char)buffer[5]);
+		}
 	}
 
 	// Check correct calculation of required length
@@ -140,22 +144,27 @@ void RunNlsTests()
 	if (res == 0)
 	{
 		failure("Calculating WideCharToMultiByte returned error %ld\n", GetLastError());
-		return;
 	}
-	if (res != 5)
+	else
 	{
-		failure("Calculating WideCharToMultiByte returned %d instead of 5\n", res);
+		if (res != 5)
+		{
+			failure("Calculating WideCharToMultiByte returned %d instead of 5\n", res);
+		}
+		if (buffer[0] != 0x11)
+		{
+			failure("Calculating WideCharToMultiByte spoiled result buffer to %x\n", (unsigned char)buffer[0]);
+		}
 	}
-	if (buffer[0] != 0x11)
-	{
-		failure("Calculating WideCharToMultiByte spoiled result buffer to %x\n", (unsigned char)buffer[0]);
-	}
+
 	// It is enough if this call don't crash
+	// Also cover the case when lpMultiByteStr is allowed to be nullptr
 	res = WideCharToMultiByte(CP_UTF8, 0, ab, 2, nullptr, 0, nullptr, nullptr);
 	if (res != 4)
 	{
 		failure("Limited calculating WideCharToMultiByte returned %d instead of 4\n", res);
 	}
+
 	// Do not test returning ERROR_INVALID_PARAMETER if lpDefaultChar is set for UTF-7/8. This is a pointless limitation.
 	// Besides, modern Unicode describes U+FFFD as a relacement charracter for such cases.
 	// But test other cases
@@ -172,6 +181,7 @@ void RunNlsTests()
 			failure("WideCharToMultiByte with zero input length returned error %ld instead of ERROR_INVALID_PARAMETER\n", err);
 		}
 	}
+
 	res = WideCharToMultiByte(CP_UTF8, 0, nullptr, 2, reinterpret_cast<char*>(buffer), 0, nullptr, nullptr);
 	if (res != 0)
 	{
@@ -185,6 +195,7 @@ void RunNlsTests()
 			failure("WideCharToMultiByte with zero input returned error %ld instead of ERROR_INVALID_PARAMETER\n", err);
 		}
 	}
+
 	res = WideCharToMultiByte(CP_UTF8, 0, reinterpret_cast<wchar_t*>(buffer), 2, reinterpret_cast<char*>(buffer), sizeof(buffer), nullptr, nullptr);
 	if (res != 0)
 	{
@@ -198,6 +209,7 @@ void RunNlsTests()
 			failure("WideCharToMultiByte with input==output returned error %ld instead of ERROR_INVALID_PARAMETER\n", err);
 		}
 	}
+
 	// MSDN: "ERROR_INSUFFICIENT_BUFFER. A supplied buffer size was not large enough, or it was incorrectly set to NULL."
 	// The part "incorrectly set to NULL" is a lie!
 	res = WideCharToMultiByte(CP_UTF8, 0, ab, 2, nullptr, sizeof(buffer), nullptr, nullptr);
@@ -210,7 +222,29 @@ void RunNlsTests()
 		DWORD err = GetLastError();
 		if (err != ERROR_INVALID_PARAMETER)
 		{
-			failure("WideCharToMultiByte with null output returned error %ld instead of ERROR_INSUFFICIENT_BUFFER\n", err);
+			failure("WideCharToMultiByte with null output returned error %ld instead of ERROR_INVALID_PARAMETER\n", err);
+		}
+	}
+
+	// Test limitation on output side
+	memset(buffer, 0x11, sizeof(buffer));
+	res = WideCharToMultiByte(CP_UTF8, 0, ab, 2, reinterpret_cast<char*>(buffer), 3, nullptr, nullptr);
+	if (res != 0)
+	{
+		failure("Output-limited WideCharToMultiByte returned %d instead of zero\n", res);
+	}
+	else
+	{
+		DWORD err = GetLastError();
+		if (err != ERROR_INSUFFICIENT_BUFFER)
+		{
+			failure("Output-limited WideCharToMultiByte returned error %ld instead of ERROR_INSUFFICIENT_BUFFER\n", err);
+		}
+		if (buffer[0] != 0xd0 || buffer[1] != 0xb0 ||
+			buffer[2] != 0x11)
+		{
+			failure("Output-limited WideCharToMultiByte result is %x%x%x instead of d0b011\n",
+					(unsigned char)buffer[0], (unsigned char)buffer[1], (unsigned char)buffer[2]);
 		}
 	}
 
@@ -220,35 +254,122 @@ void RunNlsTests()
 	if (res == 0)
 	{
 		failure("Zero-terminated WideCharToMultiByte(1251) returned error %ld\n", GetLastError());
-		return;
 	}
-	if (res != 3)
+	else
 	{
-		failure("Zero-terminated WideCharToMultiByte(1251) returned %d instead of 3\n", res);
+		if (res != 3)
+		{
+			failure("Zero-terminated WideCharToMultiByte(1251) returned %d instead of 3\n", res);
+		}
+		if (buffer[0] != 0xe0 || buffer[1] != 0xe1 ||
+			buffer[2] != 0x00 || buffer[3] != 0x11)
+		{
+			failure("Zero-terminated WideCharToMultiByte result is %x%x%x%x instead of e0e10011\n",
+					(unsigned char)buffer[0], (unsigned char)buffer[1], (unsigned char)buffer[2], (unsigned char)buffer[3]);
+		}
 	}
-	if (buffer[0] != 0xe0 || buffer[1] != 0xe1 ||
-		buffer[2] != 0x00 || buffer[3] != 0x11)
-	{
-		failure("Zero-terminated WideCharToMultiByte result is %x%x%x%x instead of e0e10011\n",
-				(unsigned char)buffer[0], (unsigned char)buffer[1], (unsigned char)buffer[2], (unsigned char)buffer[3]);
-	}
-	memset(buffer, 0x11, sizeof(buffer));
+
 	// This call should success but produce substitute symbols
-	res = WideCharToMultiByte(437, 0, ab, -1, reinterpret_cast<char*>(buffer), sizeof(buffer), nullptr, nullptr);
+	memset(buffer, 0x11, sizeof(buffer));
+	BOOL subs = FALSE;
+	res = WideCharToMultiByte(437, 0, ab, -1, reinterpret_cast<char*>(buffer), sizeof(buffer), nullptr, &subs);
 	if (res == 0)
 	{
 		failure("Zero-terminated WideCharToMultiByte(437) returned error %ld\n", GetLastError());
-		return;
 	}
-	if (res != 3)
+	else
 	{
-		failure("Zero-terminated WideCharToMultiByte(437) returned %d instead of 3\n", res);
-	}
-	if (buffer[0] != 0x3f || buffer[1] != 0x3f ||
-		buffer[2] != 0x00 || buffer[3] != 0x11)
-	{
-		failure("Zero-terminated WideCharToMultiByte result is %02x%02x%02x%02x instead of 3f3f0011\n",
-				(unsigned char)buffer[0], (unsigned char)buffer[1], (unsigned char)buffer[2], (unsigned char)buffer[3]);
+		if (subs == FALSE)
+		{
+			failure("Zero-terminated WideCharToMultiByte(437) didn't set substitutes flag to TRUE\n");
+		}
+		if (res != 3)
+		{
+			failure("Zero-terminated WideCharToMultiByte(437) returned %d instead of 3\n", res);
+		}
+		if (buffer[0] != 0x3f || buffer[1] != 0x3f ||
+			buffer[2] != 0x00 || buffer[3] != 0x11)
+		{
+			failure("Zero-terminated WideCharToMultiByte(437) result is %02x%02x%02x%02x instead of 3f3f0011\n",
+					(unsigned char)buffer[0], (unsigned char)buffer[1], (unsigned char)buffer[2], (unsigned char)buffer[3]);
+		}
 	}
 
+	memset(buffer, 0x11, sizeof(buffer));
+	subs = FALSE;
+	char s = 0x32;
+	res = WideCharToMultiByte(437, 0, ab, 2, reinterpret_cast<char*>(buffer), sizeof(buffer), &s, &subs);
+	if (res == 0)
+	{
+		failure("Limited WideCharToMultiByte(437) returned error %ld\n", GetLastError());
+	}
+	else
+	{
+		if (subs == FALSE)
+		{
+			failure("Limited WideCharToMultiByte(437) didn't set substitutes flag to TRUE\n");
+		}
+		if (res != 2)
+		{
+			failure("Limited WideCharToMultiByte(437) returned %d instead of 2\n", res);
+		}
+		if (buffer[0] != 0x32 || buffer[1] != 0x32 ||
+			buffer[2] != 0x11)
+		{
+			failure("Limited WideCharToMultiByte(437) result is %02x%02x%02x instead of 121211\n",
+					(unsigned char)buffer[0], (unsigned char)buffer[1], (unsigned char)buffer[2]);
+		}
+	}
+
+	// This one as well
+	wchar_t inval[] = { 0x40, 0xd800, 0x40 };
+	memset(buffer, 0x11, sizeof(buffer));
+	subs = FALSE;
+	res = WideCharToMultiByte(CP_UTF8, 0, inval, 3, reinterpret_cast<char*>(buffer), sizeof(buffer), nullptr, &subs);
+	if (res == 0)
+	{
+		failure("WideCharToMultiByte(invalid) returned error %ld\n", GetLastError());
+	}
+	else
+	{
+		if (subs == FALSE)
+		{
+			failure("WideCharToMultiByte(invalid) didn't set substitutes flag to TRUE\n");
+		}
+		if (res != 5)
+		{
+			failure("WideCharToMultiByte(invalid) returned %d instead of 5\n", res);
+		}
+		if (buffer[0] != 0x40 || buffer[1] != 0xef || buffer[2] != 0xbf || buffer[3] != 0xbd
+			|| buffer[4] != 0x40 || buffer[5] != 0x11)
+		{
+			failure("WideCharToMultiByte(invalid) result is %02x%02x%02x%02x%02x%02x instead of 40efbfbd4011\n",
+					(unsigned char)buffer[0], (unsigned char)buffer[1], (unsigned char)buffer[2],
+					(unsigned char)buffer[3], (unsigned char)buffer[4], (unsigned char)buffer[5]);
+		}
+	}
+
+	// And this one must return error
+	memset(buffer, 0x11, sizeof(buffer));
+	res = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, inval, 3, reinterpret_cast<char*>(buffer), sizeof(buffer), nullptr, nullptr);
+	if (res != 0)
+	{
+		failure("WideCharToMultiByte(flagged invalid) returned %d instead of zero\n", res);
+	}
+	else
+	{
+		DWORD err = GetLastError();
+		if (err != ERROR_NO_UNICODE_TRANSLATION)
+		{
+			failure("WideCharToMultiByte(flagged invalid) returned error %ld instead of ERROR_NO_UNICODE_TRANSLATION\n", err);
+		}
+
+		if (buffer[0] != 0x40 || buffer[1] != 0xef || buffer[2] != 0xbf || buffer[3] != 0xbd
+			|| buffer[4] != 0x40 || buffer[5] != 0x11)
+		{
+			failure("WideCharToMultiByte(flagged invalid) result is %02x%02x%02x%02x%02x%02x instead of 40efbfbd4011\n",
+					(unsigned char)buffer[0], (unsigned char)buffer[1], (unsigned char)buffer[2],
+					(unsigned char)buffer[3], (unsigned char)buffer[4], (unsigned char)buffer[5]);
+		}
+	}
 }

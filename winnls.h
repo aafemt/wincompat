@@ -2,9 +2,13 @@
 
 #include <langinfo.h>
 
-#define CP_ACP      0
-#define CP_OEMCP    1
-#define CP_UTF8     65001
+#include "stringapiset.h"
+
+constexpr unsigned CP_ACP = 0;
+constexpr unsigned CP_OEMCP = 1;
+constexpr unsigned CP_UTF8 = 65001;
+
+constexpr DWORD WC_ERR_INVALID_CHARS = 0x00000080;
 
 typedef nl_item LCTYPE;
 // May be it should be `const char*` instead to let "make" macros to form something like "en_us" directly...

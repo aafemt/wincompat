@@ -19,6 +19,7 @@
 #define ERROR_CALL_NOT_IMPLEMENTED	ENOSYS
 #define ERROR_SHARING_VIOLATION	EAGAIN	// At least this is what used to be returned from flock()
 #define ERROR_INVALID_NAME		EILSEQ	// Good for Unicode functions may be a bad choice for ANSI
+#define ERROR_NO_UNICODE_TRANSLATION	EILSEQ
 
 // Linux seems to miss these errors so we can assign them to somethig beyond of usual range
 #define ERROR_NO_MORE_FILES		1018
