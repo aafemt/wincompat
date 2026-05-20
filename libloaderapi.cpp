@@ -160,16 +160,26 @@ DWORD GetModuleFileName(HMODULE hModule, char* lpFileName, DWORD nSize)
 			}
 			return 0;
 		}
-		std::string fullPath(buffer);
-		fullPath += '/';
-		fullPath += map->l_name;
-		char* realPath = realpath(fullPath.c_str(), nullptr);
-		if (realPath == nullptr)
+		std::string fullPath;
+		if (map->l_name[0] == '/')
 		{
-			return 0;
+			// Library is loaded with absolute path, don't mess with it
+			fullPath = map->l_name;
 		}
-		size_t len = strlen(realPath);
-		strncpy(lpFileName, realPath, nSize);
+		else
+		{
+			fullPath = buffer;
+			fullPath += '/';
+			fullPath += map->l_name;
+			char* realPath = realpath(fullPath.c_str(), nullptr);
+			if (realPath == nullptr)
+			{
+				return 0;
+			}
+			fullPath = realPath;
+		}
+		strncpy(lpFileName, fullPath.c_str(), nSize);
+		size_t len = fullPath.size();
 		if (len >= nSize)
 		{
 			len = nSize;
