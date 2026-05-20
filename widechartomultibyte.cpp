@@ -299,6 +299,14 @@ namespace
 				{
 					if (errno == EILSEQ)
 					{
+						// Special handling for case when invalid character would overflow output buffer
+						// It seems that iconv has priority of EILSEQ higher than E2BIG
+//						if (outbytesleft == 0)
+//						{
+//							result = 0;
+//							errno = ERROR_INSUFFICIENT_BUFFER;
+//							break;
+//						}
 						if (lpUsedDefaultChar != nullptr)
 						{
 							*lpUsedDefaultChar = TRUE;
@@ -322,8 +330,8 @@ namespace
 						break;
 					}
 				}
+				result = outbuf - lpMultiByteStr;
 			}
-			result = outbuf - lpMultiByteStr;
 		}
 
 		iconv_close(conv);

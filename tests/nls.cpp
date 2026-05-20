@@ -349,6 +349,32 @@ void RunNlsTests()
 		}
 	}
 
+	// And this test must stop exactly before invalid character
+	memset(buffer, 0x11, sizeof(buffer));
+	subs = FALSE;
+	res = WideCharToMultiByte(437, 0, inval, 3, reinterpret_cast<char*>(buffer), 1, nullptr, &subs);
+	if (res != 0)
+	{
+		failure("WideCharToMultiByte(valid) returned %d instead of zero\n", res);
+	}
+	else
+	{
+		if (subs == TRUE)
+		{
+			failure("WideCharToMultiByte(valid) set substitutes flag to TRUE\n");
+		}
+		DWORD err = GetLastError();
+		if (err != ERROR_INSUFFICIENT_BUFFER)
+		{
+			failure("WideCharToMultiByte(valid) returned error %ld instead of ERROR_INSUFFICIENT_BUFFER\n", err);
+		}
+		if (buffer[0] != 0x40 || buffer[1] != 0x11)
+		{
+			failure("WideCharToMultiByte(valid) result is %02x%02x instead of 4011\n",
+					(unsigned char)buffer[0], (unsigned char)buffer[1]);
+		}
+	}
+
 	// And this one must return error
 	memset(buffer, 0x11, sizeof(buffer));
 	res = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, inval, 3, reinterpret_cast<char*>(buffer), sizeof(buffer), nullptr, nullptr);

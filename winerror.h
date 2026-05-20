@@ -15,7 +15,7 @@
 #define ERROR_INVALID_PARAMETER EINVAL
 #define ERROR_NOACCESS          EFAULT
 #define ERROR_NOT_ENOUGH_MEMORY	ENOMEM
-#define ERROR_INSUFFICIENT_BUFFER	ENAMETOOLONG // May be not the best choice
+#define ERROR_INSUFFICIENT_BUFFER	E2BIG
 #define ERROR_CALL_NOT_IMPLEMENTED	ENOSYS
 #define ERROR_SHARING_VIOLATION	EAGAIN	// At least this is what used to be returned from flock()
 #define ERROR_INVALID_NAME		EILSEQ	// Good for Unicode functions may be a bad choice for ANSI
