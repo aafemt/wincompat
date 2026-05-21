@@ -149,37 +149,37 @@ DWORD GetModuleFileName(HMODULE hModule, char* lpFileName, DWORD nSize)
 			errno = ERROR_INVALID_HANDLE;
 			return 0;
 		}
-		char buffer[MAX_PATH];
-		errno = 0;
-		res = dlinfo(hModule, RTLD_DI_ORIGIN, &buffer);
-		if (res != 0)
-		{
-			if (errno == 0)
-			{
-				errno = ERROR_INVALID_HANDLE;
-			}
-			return 0;
-		}
 		std::string fullPath;
 		if (map->l_name[0] == '/')
 		{
-			// Library is loaded with absolute path, don't mess with it
+			// Library is loaded with absolute path, don't mess with it...
 			fullPath = map->l_name;
 		}
 		else
 		{
+			char buffer[MAX_PATH];
+			errno = 0;
+			res = dlinfo(hModule, RTLD_DI_ORIGIN, &buffer);
+			if (res != 0)
+			{
+				if (errno == 0)
+				{
+					errno = ERROR_INVALID_HANDLE;
+				}
+				return 0;
+			}
 			fullPath = buffer;
 			fullPath += '/';
 			fullPath += map->l_name;
-			char* realPath = realpath(fullPath.c_str(), nullptr);
-			if (realPath == nullptr)
-			{
-				return 0;
-			}
-			fullPath = realPath;
 		}
-		strncpy(lpFileName, fullPath.c_str(), nSize);
-		size_t len = fullPath.size();
+		// ...but still resolve links
+		char* realPath = realpath(fullPath.c_str(), nullptr);
+		if (realPath == nullptr)
+		{
+			return 0;
+		}
+		strncpy(lpFileName, realPath, nSize);
+		size_t len = strlen(realPath);
 		if (len >= nSize)
 		{
 			len = nSize;
