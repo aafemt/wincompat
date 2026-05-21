@@ -40,3 +40,8 @@ int _wcsnicmp(const wchar_t* string1, const wchar_t* string2, size_t count)
 {
 	return wcsncasecmp(string1, string2, count);
 }
+
+int _wcsicmp(const wchar_t* string1, const wchar_t* string2)
+{
+	return wcscasecmp(string1, string2);
+}
