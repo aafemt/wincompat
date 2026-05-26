@@ -18,9 +18,6 @@
 
 /* Windows compatibility header */
 
-// This bit flag has no use on Linux, so define it to zero to make it no-op
-const int O_BINARY = 0;
-
 HANDLE CreateEvent(void*, WINBOOL bManualReset, WINBOOL bInitialState, char*);
 WINBOOL SetEvent(HANDLE event);
 WINBOOL ResetEvent(HANDLE event);

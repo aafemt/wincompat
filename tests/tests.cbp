@@ -71,6 +71,9 @@
 		<Unit filename="../errhandlingapi.h">
 			<Option target="Linux" />
 		</Unit>
+		<Unit filename="../fcntl.h">
+			<Option target="Linux" />
+		</Unit>
 		<Unit filename="../file_holder.h">
 			<Option target="Linux" />
 		</Unit>

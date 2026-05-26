@@ -2,6 +2,7 @@
 
 #include_next <stdlib.h>
 #include <stdint.h>
+#include <locale.h>
 
 // GLIBC has implementation inside but doesn't publish it (yet?).
 // Use our own implementation.
