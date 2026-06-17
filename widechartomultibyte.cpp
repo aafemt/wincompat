@@ -2,6 +2,7 @@
 
 #include <map>
 #include <iconv.h>
+#include <wchar.h>
 
 #include "stringapiset.h"
 #include "winerror.h"
