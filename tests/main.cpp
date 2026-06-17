@@ -24,7 +24,6 @@ int main()
 		failure("setlocale in main returned null\n");
 		return 1;
 	}
-	printf("Locale is %s\n", setlocale(LC_ALL, nullptr));
 
 	RunStringTests();
 	RunEnvTests();

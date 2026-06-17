@@ -50,6 +50,8 @@
     {
       name: "Build and test",
       image: "dctl-registry.dcinet:5000/suse-15.4/gcc-11-suse-15.4",
+      environment:
+      {  LC_ALL: "en_US.UTF-8"  },
       commands:
       [
         "cd tests",

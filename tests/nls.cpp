@@ -32,11 +32,11 @@ void checkLocaleInfo(LCID locale, LCTYPE value, const wchar_t* expected, DWORD e
 	int expectedLength = wcslen(expected);
 	if (r != expectedLength)
 	{
-		failure("Value length is %d instead of expected %d for %S\n", r, expectedLength, expected);
+		failure("GetLocaleInfoW value length is %d instead of expected %d for %S\n", r, expectedLength, expected);
 	}
 	if (wcscmp(buffer, expected) != 0)
 	{
-		failure("Got value '%S' while expected '%S'\n", buffer, expected);
+		failure("GetLocaleInfoW got value '%S' while expected '%S'\n", buffer, expected);
 	}
 }
 
