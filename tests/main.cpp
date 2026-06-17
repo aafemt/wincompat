@@ -19,7 +19,7 @@ void RunStringTests();
 
 int main()
 {
-	if (setlocale(LC_ALL, "en_GB.utf8") == nullptr)
+	if (setlocale(LC_ALL, "") == nullptr)
 	{
 		failure("setlocale in main returned null\n");
 		return 1;
