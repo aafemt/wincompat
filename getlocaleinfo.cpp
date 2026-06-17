@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <wchar.h>
+#include <string>
 #include <unordered_map>
 
 #include "winnls.h"
