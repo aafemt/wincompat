@@ -1,3 +1,4 @@
+[
 {
   kind: "pipeline",
   name: "Windows 64 build",
@@ -34,4 +35,33 @@
       ],
     },
   ]
-}
+},
+{
+  kind: "pipeline",
+  name: "Linux build",
+  platform: {
+    os: "linux",
+    arch: "amd64"
+  },
+  clone: { disable: false },
+  trigger: { event: [ "push", "custom" ] },
+  steps:
+  [
+    {
+      name: "Build and test",
+      image: "dctl-registry.dcinet:5000/suse-15.4/gcc-11-suse-15.4",
+      commands:
+      [
+        "cd tests",
+        "mkdir build",
+        "cbp2make.exe -in testdll.cbp",
+        "cbp2make.exe -in tests.cbp",
+        "make -f testdll.cbp.mak linux",
+        "make -f tests.cbp.mak linux",
+		"cd build",
+		"./tests",
+      ],
+    },
+  ]
+},
+]
