@@ -54,8 +54,8 @@
       [
         "cd tests",
         "mkdir build",
-        "cbp2make.exe -in testdll.cbp",
-        "cbp2make.exe -in tests.cbp",
+        "cbp2make -in testdll.cbp",
+        "cbp2make -in tests.cbp",
         "make -f testdll.cbp.mak linux",
         "make -f tests.cbp.mak linux",
 		"cd build",
