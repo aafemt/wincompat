@@ -19,7 +19,12 @@ void RunStringTests();
 
 int main()
 {
-	setlocale(LC_ALL, "");
+	if (setlocale(LC_ALL, "en_GB.utf8") == nullptr)
+	{
+		failure("setlocale in main returned null\n");
+		return 1;
+	}
+	printf("Locale is %s\n", setlocale(LC_ALL, nullptr));
 
 	RunStringTests();
 	RunEnvTests();
