@@ -58,7 +58,7 @@
       [
         "find /usr -name \"libicuuc.so*\"",
         "echo 'intl_module = builtin {\\\\n icu_versions =' `find /usr -name 'libicuuc.so.??' 2>/dev/null | sed -e 's/.*\\\\.so\\\\.//' | sort -nr` '\\\\n}' >fbintl.conf",
-        "cat intl.conf"
+        "cat fbintl.conf"
 /*
         "cd tests",
         "mkdir build",
