@@ -1,4 +1,5 @@
 [
+/*
 {
   kind: "pipeline",
   name: "Windows 64 build",
@@ -36,9 +37,10 @@
     },
   ]
 },
+*/
 {
   kind: "pipeline",
-  name: "Linux build",
+  name: "Linux explore",
   platform: {
     os: "linux",
     arch: "amd64"
@@ -48,12 +50,15 @@
   steps:
   [
     {
-      name: "Build and test",
+      name: "Test",
       image: "dctl-registry.dcinet:5000/suse-15.4/gcc-11-suse-15.4",
       environment:
       {  LC_ALL: "en_US.UTF-8"  },
       commands:
       [
+        "find /usr -name \"libicuuc.so*\"",
+        "echo \"intl_module = builtin {\n icu_versions =\" `find /usr -name \"libicuuc.so.??\" 2>/dev/null | sed -e 's/.*\.so\.//' | sort -nr` \"\n}\""
+/*
         "cd tests",
         "mkdir build",
         "cbp2make -in testdll.cbp",
@@ -62,6 +67,7 @@
         "make -f tests.cbp.mak linux",
 		"cd build",
 		"./tests",
+*/
       ],
     },
   ]
