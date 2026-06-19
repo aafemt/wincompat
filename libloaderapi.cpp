@@ -149,43 +149,8 @@ DWORD GetModuleFileName(HMODULE hModule, char* lpFileName, DWORD nSize)
 			errno = ERROR_INVALID_HANDLE;
 			return 0;
 		}
-		std::string fullPath;
-		if (map->l_name[0] == '/')
-		{
-			// Library is loaded with absolute path, don't mess with it...
-			fullPath = map->l_name;
-		}
-		else
-		{
-			char buffer[MAX_PATH];
-			errno = 0;
-			res = dlinfo(hModule, RTLD_DI_ORIGIN, &buffer);
-			if (res != 0)
-			{
-				if (errno == 0)
-				{
-					errno = ERROR_INVALID_HANDLE;
-				}
-				return 0;
-			}
-			fullPath = buffer;
-			// Here problem is that if LD_LIBRARY_PATH is set to XXX (relative),
-			// then the origin ends with XXX while l_name also includes XXX.
-			// Perhaps finding common substring would be better, but for now just cut
-			// any path from l_name.
-			const char* slash = strrchr(map->l_name, '/');
-			if (slash != nullptr)
-			{
-				fullPath += slash;
-			}
-			else
-			{
-				fullPath += '/';
-				fullPath += map->l_name;
-			}
-		}
-		// ...but still resolve links
-		char* realPath = realpath(fullPath.c_str(), nullptr);
+		// Resolve to absolute path
+		char* realPath = realpath(map->l_name, nullptr);
 		if (realPath == nullptr)
 		{
 			return 0;
