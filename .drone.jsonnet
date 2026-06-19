@@ -1,5 +1,4 @@
 [
-/*
 {
   kind: "pipeline",
   name: "Windows 64 build",
@@ -37,10 +36,9 @@
     },
   ]
 },
-*/
 {
   kind: "pipeline",
-  name: "Linux explore",
+  name: "Linux build",
   platform: {
     os: "linux",
     arch: "amd64"
@@ -56,19 +54,14 @@
       {  LC_ALL: "en_US.UTF-8"  },
       commands:
       [
-        "find /usr -name \"libicuuc.so*\"",
-        "echo -e 'intl_module = builtin {\\\\n icu_versions =' `find /usr -name 'libicuuc.so.??' 2>/dev/null | sed -e 's/.*\\\\.so\\\\.//' | sort -nr` '\\\\n}' >fbintl.conf",
-        "cat fbintl.conf"
-/*
         "cd tests",
         "mkdir build",
         "cbp2make -in testdll.cbp",
         "cbp2make -in tests.cbp",
         "make -f testdll.cbp.mak linux",
         "make -f tests.cbp.mak linux",
-		"cd build",
-		"./tests",
-*/
+        "cd build",
+        "./tests",
       ],
     },
   ]
