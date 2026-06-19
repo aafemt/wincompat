@@ -169,8 +169,20 @@ DWORD GetModuleFileName(HMODULE hModule, char* lpFileName, DWORD nSize)
 				return 0;
 			}
 			fullPath = buffer;
-			fullPath += '/';
-			fullPath += map->l_name;
+			// Here problem is that if LD_LIBRARY_PATH is set to XXX (relative),
+			// then the origin ends with XXX while l_name also includes XXX.
+			// Perhaps finding common substring would be better, but for now just cut
+			// any path from l_name.
+			const char* slash = strrchr(map->l_name, '/');
+			if (slash != nullptr)
+			{
+				fullPath += slash;
+			}
+			else
+			{
+				fullPath += '/';
+				fullPath += map->l_name;
+			}
 		}
 		// ...but still resolve links
 		char* realPath = realpath(fullPath.c_str(), nullptr);
