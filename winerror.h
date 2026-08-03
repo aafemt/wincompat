@@ -11,6 +11,7 @@
 #define ERROR_INVALID_HANDLE    EBADF
 #define ERROR_FILE_NOT_FOUND    ENOENT
 #define ERROR_PATH_NOT_FOUND    ENOENT	// It is not good that Linux makes no difference between them
+#define ERROR_FILE_EXISTS		EEXIST
 #define ERROR_ALREADY_EXISTS	EEXIST
 #define ERROR_INVALID_PARAMETER EINVAL
 #define ERROR_NOACCESS          EFAULT
