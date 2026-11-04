@@ -10,6 +10,11 @@ constexpr unsigned CP_UTF8 = 65001;
 
 constexpr DWORD WC_ERR_INVALID_CHARS = 0x00000080;
 
+#define HIGH_SURROGATE_START 0xd800
+#define HIGH_SURROGATE_END 0xdbff
+#define LOW_SURROGATE_START 0xdc00
+#define LOW_SURROGATE_END 0xdfff
+
 typedef nl_item LCTYPE;
 // May be it should be `const char*` instead to let "make" macros to form something like "en_us" directly...
 typedef unsigned LCID;

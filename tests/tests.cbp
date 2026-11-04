@@ -183,6 +183,9 @@
 		<Unit filename="../synchron.cpp">
 			<Option target="Linux" />
 		</Unit>
+		<Unit filename="../tchar.h">
+			<Option target="Linux" />
+		</Unit>
 		<Unit filename="../wcwmain.cpp">
 			<Option target="Linux" />
 		</Unit>

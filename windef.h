@@ -30,6 +30,7 @@ typedef void* HWND;
 typedef unsigned short WORD;
 typedef unsigned char BYTE;
 typedef void* LPVOID;
+typedef unsigned int UINT;
 
 inline WORD MAKEWORD(BYTE a, BYTE b) { return a | static_cast<WORD>(b) << 8; }
 inline BYTE LOBYTE(WORD w) { return w & 0xff; }
